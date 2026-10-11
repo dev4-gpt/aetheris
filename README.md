@@ -7,7 +7,7 @@
 **Fusing 14 Real-Time Telemetry Streams, Google Photorealistic 3D Tiles, and Google DeepMind AlphaEarth 10m Planetary Intelligence**
 
 [![Live Demo](https://img.shields.io/badge/Live_Production-aetheris--spatial.vercel.app-00f0ff?style=for-the-badge&logo=vercel)](https://aetheris-spatial.vercel.app)
-[![Tests Passing](https://img.shields.io/badge/Tests-2%2C746%20Passed-10b981?style=for-the-badge&logo=node.js)](https://github.com/dev4-gpt/delightful-hawk)
+[![Node Test Suite](https://img.shields.io/badge/Tests-Run%20Locally-10b981?style=for-the-badge&logo=node.js)](https://github.com/dev4-gpt/delightful-hawk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-38bdf8?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Engine: CesiumJS](https://img.shields.io/badge/Engine-CesiumJS%201.124-f59e0b?style=for-the-badge)](https://cesium.com)
 [![Foundation Model](https://img.shields.io/badge/AI-DeepMind%20AlphaEarth-8b5cf6?style=for-the-badge)](https://deepmind.google)
@@ -17,6 +17,12 @@
 ### [🚀 Try Live Production Deployment](https://aetheris-spatial.vercel.app) · [🎥 Watch 1080p Walkthrough Video](docs/media/aetheris_gtm_product_walkthrough.mp4) · [📖 Architecture Paper](WHITE_PAPER_AETHERIS_WORLD_ENGINE.md)
 
 </div>
+
+---
+
+## Defense prototype status
+
+The [defense startup readiness review](DEFENSE_STARTUP_READINESS.md) separates the working geospatial prototype from simulated defense scenarios and lists the evidence needed for customer pilots, open-interface claims, environmental claims, and cost estimates. The [open source adoption note](OPEN_SOURCE_ADOPTION.md) records the free standards and code considered, their licenses, and the new local observation review workflow. The defense screen and its module catalog are research demos; they do not establish Army endorsement, field readiness, standards conformance, or verified cost per kill.
 
 ---
 

@@ -843,15 +843,18 @@ test('ExtremeClimateAgent: SUBTERRANEAN caps LOS to 180m and switches to Acousti
   assert.equal(env.navigationMode, 'LIDAR_SLAM_FIBER_OPTIC_TETHER');
 });
 
-test('MosaAdapterAgent: pre-loads 5 open-system COTS modules and exports IBCS/FAAD C2 bundle', () => {
+test('MosaAdapterAgent: exports an explicitly unverified scenario catalog', () => {
   const mosa = new MosaAdapterAgent();
   assert.equal(mosa.listModules().length, 5);
   const bundle = mosa.exportMosaBundle();
-  assert.equal(bundle.vendorLockInCount, 0);
-  assert.ok(bundle.statutoryCompliance.includes('10 U.S.C.'));
+  assert.equal(bundle.artifactType, 'AETHERIS_DEMO_MODULE_CATALOG');
+  assert.equal(bundle.validationStatus, 'UNVERIFIED_SIMULATION');
+  assert.equal(bundle.declaredVendorLockInCount, 0);
+  assert.ok(bundle.modules.every(module => module.status === 'SIMULATED'));
+  assert.ok(!('statutoryCompliance' in bundle));
 });
 
-test('MosaAdapterAgent: accepts compliant startup sensor and rejects proprietary vendor lock-in', () => {
+test('MosaAdapterAgent: registers scenario metadata and rejects declared vendor lock-in', () => {
   const mosa = new MosaAdapterAgent();
   const rejected = mosa.registerModule({
     moduleId: 'LEGACY-LOCKED-RADAR',
@@ -872,7 +875,17 @@ test('MosaAdapterAgent: accepts compliant startup sensor and rejects proprietary
     vendorLockIn: false
   });
   assert.equal(accepted.accepted, true);
+  assert.equal(accepted.validationStatus, 'METADATA_ONLY_UNVERIFIED');
   assert.equal(mosa.listModules('SENSOR').length, 2);
+});
+
+test('MosaAdapterAgent: rejects incomplete and non-finite scenario entries', () => {
+  const mosa = new MosaAdapterAgent({ initialModules: [] });
+  const base = { moduleId: 'DEMO-01', vendor: 'Example', category: 'SENSOR', protocol: 'SOSA_1_0', vendorLockIn: false };
+  assert.equal(mosa.registerModule({ ...base, moduleId: '   ' }).accepted, false);
+  assert.equal(mosa.registerModule({ ...base, vendorLockIn: undefined }).accepted, false);
+  assert.equal(mosa.registerModule({ ...base, unitCostUsd: Number.NaN }).accepted, false);
+  assert.equal(mosa.listModules().length, 0);
 });
 
 test('ContestedLogisticsAgent: forecasts Time-to-Winchester and fabricates 3D-printed interceptors', () => {
@@ -942,4 +955,3 @@ test('MasterRouterSwarm: orchestrates all 4 US Army YC RFS pillars end-to-end wi
   assert.equal(swarm.agentShield.verifyAuditChain(), true);
   swarm.cotStream.close();
 });
-

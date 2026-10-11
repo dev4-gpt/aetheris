@@ -1,5 +1,8 @@
 # AETHERIS DEFENSE TWIN: STRATEGIC EVALUATION, GROWTH BLUEPRINT & AGENTIC SWARM ARCHITECTURE
 
+> **Historical draft — not approved for external use.** This document contains unvalidated TRL, cost, integration, valuation, and customer claims. See [the current defense startup readiness review](../../DEFENSE_STARTUP_READINESS.md) before using any claim in a pitch.
+
+
 **Date:** September 30, 2026  
 **Classification:** Proprietary / Defense-Tech Commercial  
 **System Status:** 2,748 of 2,749 tests passing (0 failures, 1 allocation microbenchmark calibrated for Node 24 GC runtime)  

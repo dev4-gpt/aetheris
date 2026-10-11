@@ -1,12 +1,13 @@
 /**
- * ExtremeClimateAgent — MIL-STD-810H Multi-Theater Environmental Physics Engine
+ * ExtremeClimateAgent — illustrative multi-theater scenario parameters.
  *
  * Directly addresses US Secretary of the Army Daniel P. Driscoll's YC RFS:
  * "The Army must dominate everywhere, from the Arctic to the archipelago and
  *  from space to subterranean environments... and we need it all to survive
  *  the most extreme climates on Earth."
  *
- * Computes deterministic MIL-STD-810H physics impacts on:
+ * Computes deterministic scenario outputs using uncalibrated assumptions. The
+ * referenced standards identify possible test methods, not conformance.
  *   1. Interceptor Li-Po / solid-rocket propulsion & battery capacity derating
  *   2. High-Energy Laser (HEL) atmospheric transmittance (Beer-Lambert law)
  *   3. Radar sea-skimming multipath, snow clutter, and subterranean NLOS caps
@@ -115,7 +116,7 @@ export const THEATER_PROFILES = Object.freeze({
 export class ExtremeClimateAgent {
   constructor(options = {}) {
     this.name = 'ExtremeClimateAgent';
-    this.role = 'MIL-STD-810H Multi-Theater Environmental Physics & Survival Engine';
+    this.role = 'Illustrative multi-theater environment simulation';
     this.activeTheaterId = options.theaterId || 'TEMPERATE';
     this.thermalJacketEnabled = options.thermalJacketEnabled ?? true;
   }
@@ -172,7 +173,8 @@ export class ExtremeClimateAgent {
       agent: this.name,
       theaterId: profile.id,
       theaterName: profile.name,
-      milStdCompliance: profile.milStdRef,
+      standardReference: profile.milStdRef,
+      validationStatus: 'UNCALIBRATED_SCENARIO',
       ambientTempC: profile.ambientTempC,
       windSpeedKmh: profile.windSpeedKmh,
       relativeHumidityPct: profile.relativeHumidityPct,

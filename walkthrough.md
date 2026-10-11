@@ -1,4 +1,7 @@
 # Strategic Decoupling & Aetheris Horizon Walkthrough
+
+> **Historical development log.** Later defense sections contain simulated results and unvalidated cost or readiness claims. See [the current defense startup readiness review](DEFENSE_STARTUP_READINESS.md) for current external positioning.
+
 ## 1. The Defense / Geospatial World Engine (Aetheris Spatial)
 ## 2. The Standalone Generative Cinema Workstation (Wiza)
 ## 3. Aetheris Horizon: Sovereign Spatial AI Copilot & Evolution Engine

@@ -1,4 +1,7 @@
 # AETHERIS SPATIAL // GO-TO-MARKET (GTM) LAUNCH PLAYBOOK
+
+> **Historical draft — not approved for external use.** Pricing, ROI, accreditation, integration, and defense readiness figures below are hypotheses or unverified claims. Use [the current defense startup readiness review](DEFENSE_STARTUP_READINESS.md) for external positioning and evidence gates.
+
 **Category-Defining Planetary Spatial Intelligence & Sovereign World Engine**
 *Live Production Deployment: [`https://aetheris-spatial.vercel.app`](https://aetheris-spatial.vercel.app)*
 

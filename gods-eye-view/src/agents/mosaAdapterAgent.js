@@ -1,5 +1,5 @@
 /**
- * MosaAdapterAgent — US Army MOSA (Modular Open Systems Approach) & SOSA Plug-and-Play Registry
+ * MosaAdapterAgent — illustrative modular systems registry for a browser demo.
  *
  * Directly addresses US Secretary of the Army Daniel P. Driscoll's YC RFS:
  * "Modern combat demands commercially developed, modular open-system solutions,
@@ -7,11 +7,8 @@
  *  sensors, software, payloads, and other hardware that plugs directly into our
  *  open system architecture."
  *
- * Enforces:
- *   - 10 U.S.C. § 4401 Modular Open Systems Approach (MOSA) compliance
- *   - Sensor Open Systems Architecture (SOSA) Technical Standard 1.0
- *   - US Army FAAD C2 (Forward Area Air Defense) & IBCS (Integrated Battle Command System)
- *   - Zero proprietary vendor lock-in validation
+ * Protocol names and vendor examples are scenario metadata. This registry does
+ * not implement those interfaces or establish MOSA conformance.
  */
 
 export const SUPPORTED_OPEN_PROTOCOLS = Object.freeze([
@@ -25,8 +22,8 @@ export const SUPPORTED_OPEN_PROTOCOLS = Object.freeze([
 
 export const DEFAULT_COTS_MODULES = Object.freeze([
   {
-    moduleId: 'ECHODYNE-ECHOGUARD-MESA',
-    vendor: 'Echodyne (Commercial COTS)',
+    moduleId: 'DEMO-RADAR-01',
+    vendor: 'Illustrative sensor vendor',
     category: 'SENSOR',
     subcategory: 'KA_BAND_4D_RADAR',
     protocol: 'COT_MIL_STD_2525C',
@@ -34,11 +31,11 @@ export const DEFAULT_COTS_MODULES = Object.freeze([
     unitCostUsd: 38000,
     powerDrawWatts: 75,
     vendorLockIn: false,
-    status: 'ONLINE'
+    status: 'SIMULATED'
   },
   {
-    moduleId: 'ANDURIL-PULSAR-EW',
-    vendor: 'Commercial EW Partner',
+    moduleId: 'DEMO-RF-01',
+    vendor: 'Illustrative RF vendor',
     category: 'EFFECTOR',
     subcategory: 'RF_CYBER_PROTOCOL_JAMMER',
     protocol: 'SOSA_1_0',
@@ -47,11 +44,11 @@ export const DEFAULT_COTS_MODULES = Object.freeze([
     costPerShotUsd: 0.05,
     powerDrawWatts: 240,
     vendorLockIn: false,
-    status: 'ONLINE'
+    status: 'SIMULATED'
   },
   {
-    moduleId: 'DE-SHORAD-HEL-50KW',
-    vendor: 'Commercial Directed Energy',
+    moduleId: 'DEMO-ENERGY-01',
+    vendor: 'Illustrative energy vendor',
     category: 'EFFECTOR',
     subcategory: 'HIGH_ENERGY_LASER_50KW',
     protocol: 'FAAD_C2_DDS',
@@ -60,11 +57,11 @@ export const DEFAULT_COTS_MODULES = Object.freeze([
     costPerShotUsd: 1.50,
     powerDrawWatts: 50000,
     vendorLockIn: false,
-    status: 'ONLINE'
+    status: 'SIMULATED'
   },
   {
-    moduleId: 'AETHERIS-INTERCEPTOR-MK2',
-    vendor: 'Aetheris Defense Systems',
+    moduleId: 'DEMO-INTERCEPTOR-01',
+    vendor: 'Illustrative hardware concept',
     category: 'EFFECTOR',
     subcategory: 'ATTRITABLE_KINETIC_INTERCEPTOR',
     protocol: 'MAVLINK_V2',
@@ -73,11 +70,11 @@ export const DEFAULT_COTS_MODULES = Object.freeze([
     costPerShotUsd: 4800,
     powerDrawWatts: 15,
     vendorLockIn: false,
-    status: 'ONLINE'
+    status: 'SIMULATED'
   },
   {
-    moduleId: 'SILVUS-STREAMCASTER-4400',
-    vendor: 'Silvus Technologies (COTS)',
+    moduleId: 'DEMO-COMMS-01',
+    vendor: 'Illustrative communications vendor',
     category: 'COMMS',
     subcategory: 'MIMO_MANET_MESH_RADIO',
     protocol: 'IBCS_LINK16_JREAP',
@@ -85,25 +82,24 @@ export const DEFAULT_COTS_MODULES = Object.freeze([
     unitCostUsd: 14200,
     powerDrawWatts: 40,
     vendorLockIn: false,
-    status: 'ONLINE'
+    status: 'SIMULATED'
   }
 ]);
 
 export class MosaAdapterAgent {
   constructor(options = {}) {
     this.name = 'MosaAdapterAgent';
-    this.role = 'US Army MOSA / SOSA / IBCS Open-System Plug-and-Play Registry';
+    this.role = 'Illustrative modular systems registry';
     this.modules = new Map();
 
     const initialModules = options.initialModules || DEFAULT_COTS_MODULES;
     for (const mod of initialModules) {
-      this.modules.set(mod.moduleId, { ...mod, registeredAt: Date.now() });
+      this.modules.set(mod.moduleId, { ...mod, status: 'SIMULATED', registeredAt: Date.now() });
     }
   }
 
   /**
-   * Validates and hot-plugs a commercial sensor, software payload, or effector
-   * into the US Army MOSA open architecture registry.
+   * Checks basic scenario metadata before adding a module to the local demo.
    *
    * Rejects proprietary vendor-locked systems or unrecognized closed protocols.
    *
@@ -112,15 +108,15 @@ export class MosaAdapterAgent {
    */
   registerModule(manifest) {
     if (!manifest || typeof manifest !== 'object') {
-      throw new TypeError('MOSA manifest must be a valid object');
+      throw new TypeError('Demo module entry must be a valid object');
     }
 
     const { moduleId, vendor, category, protocol, vendorLockIn } = manifest;
 
-    if (!moduleId || !vendor || !category) {
+    if ([moduleId, vendor, category].some(value => typeof value !== 'string' || !value.trim())) {
       return {
         accepted: false,
-        reason: 'MISSING_REQUIRED_FIELDS: moduleId, vendor, and category are mandatory under MOSA'
+        reason: 'MISSING_REQUIRED_FIELDS: moduleId, vendor, and category are required for this demo catalog'
       };
     }
 
@@ -128,7 +124,15 @@ export class MosaAdapterAgent {
       return {
         accepted: false,
         moduleId,
-        reason: 'MOSA_VIOLATION_PROPRIETARY_LOCK_IN: 10 U.S.C. 4401 prohibits proprietary vendor lock-in interfaces'
+        reason: 'MOSA_VIOLATION_PROPRIETARY_LOCK_IN: this demo catalog excludes entries declaring vendor lock-in; no legal finding is implied'
+      };
+    }
+
+    if (vendorLockIn !== false) {
+      return {
+        accepted: false,
+        moduleId,
+        reason: 'UNDECLARED_INTERFACE_RIGHTS: the scenario entry must explicitly declare its interface rights'
       };
     }
 
@@ -138,6 +142,12 @@ export class MosaAdapterAgent {
         moduleId,
         reason: `UNSUPPORTED_CLOSED_PROTOCOL: ${protocol}. Must use one of: ${SUPPORTED_OPEN_PROTOCOLS.join(', ')}`
       };
+    }
+
+    for (const field of ['unitCostUsd', 'costPerShotUsd', 'powerDrawWatts']) {
+      if (manifest[field] !== undefined && (!Number.isFinite(Number(manifest[field])) || Number(manifest[field]) < 0)) {
+        return { accepted: false, moduleId, reason: `INVALID_SCENARIO_NUMBER: ${field} must be finite and non-negative` };
+      }
     }
 
     const normalizedEntry = {
@@ -151,7 +161,7 @@ export class MosaAdapterAgent {
       costPerShotUsd: Number(manifest.costPerShotUsd ?? 0),
       powerDrawWatts: Number(manifest.powerDrawWatts ?? 50),
       vendorLockIn: false,
-      status: 'ONLINE',
+      status: 'SIMULATED',
       registeredAt: Date.now()
     };
 
@@ -162,7 +172,8 @@ export class MosaAdapterAgent {
       moduleId: normalizedEntry.moduleId,
       protocol: normalizedEntry.protocol,
       totalRegisteredModules: this.modules.size,
-      module: normalizedEntry
+      module: normalizedEntry,
+      validationStatus: 'METADATA_ONLY_UNVERIFIED'
     };
   }
 
@@ -179,7 +190,7 @@ export class MosaAdapterAgent {
   }
 
   /**
-   * Exports a US Army FAAD C2 / IBCS-compliant MOSA system topology manifest.
+   * Exports scenario metadata. This is not a conformance or integration artifact.
    * @returns {Object}
    */
   exportMosaBundle() {
@@ -189,10 +200,12 @@ export class MosaAdapterAgent {
     const comms = modulesList.filter(m => m.category === 'COMMS');
 
     return {
-      standard: 'US Army MOSA / SOSA Technical Standard 1.0 / FAAD C2',
-      statutoryCompliance: '10 U.S.C. § 4401 Modular Open Systems Approach',
-      c2Integration: ['IBCS (Integrated Battle Command System)', 'FAAD C2', 'TAK / Cursor-on-Target'],
-      vendorLockInCount: 0,
+      artifactType: 'AETHERIS_DEMO_MODULE_CATALOG',
+      validationStatus: 'UNVERIFIED_SIMULATION',
+      disclaimer: 'Scenario metadata only. No hardware, interface, MOSA, SOSA, FAAD C2, IBCS, or vendor conformance has been verified.',
+      standardReferences: ['MOSA', 'SOSA Technical Standard 1.0'],
+      proposedIntegrationTargets: ['IBCS', 'FAAD C2', 'TAK / Cursor-on-Target'],
+      declaredVendorLockInCount: modulesList.filter(m => m.vendorLockIn === true).length,
       totalModules: modulesList.length,
       summary: {
         sensors: sensors.length,
