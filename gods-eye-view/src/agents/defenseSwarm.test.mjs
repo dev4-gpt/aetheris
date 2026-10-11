@@ -18,6 +18,9 @@ import { CotStreamAgent, COT_TYPES, buildCotXml } from './cotStreamAgent.js';
 import { AarReplayEngine, REPLAY_STATE } from './aarReplayEngine.js';
 import { RadarFenceAgent, computeRadarHorizon, computeBlindZone, buildRadarSectorGeoJSON } from './radarFenceAgent.js';
 import { AdsbBridge, stateVectorToTrack, isMilitaryIcao, classifySquawk } from './adsbBridge.js';
+import { ExtremeClimateAgent, THEATER_PROFILES } from './extremeClimateAgent.js';
+import { MosaAdapterAgent, SUPPORTED_OPEN_PROTOCOLS } from './mosaAdapterAgent.js';
+import { ContestedLogisticsAgent } from './contestedLogisticsAgent.js';
 
 // ==========================================
 // 1. RadarLOSAgent Tests
@@ -754,5 +757,189 @@ test('AdsbBridge: gracefully marks NaN coordinates as non-cooperative ghost trac
   assert.equal(track.cooperative, false, 'Non-numeric coords must be flagged as non-cooperative ghost');
   assert.equal(track.lat, null);
   assert.equal(track.lon, null);
+});
+
+// ==========================================
+// US SECRETARY OF THE ARMY YC RFS SUITE TESTS
+// ("The Future of American Defense" — MOSA, Extreme Climates, Cost-Per-Kill, Contested Logistics)
+// ==========================================
+
+test('FireControlAgent: Tier-1 ($0.05 EW Jammer) selected for commercial FPV drone with active RF link', () => {
+  const agent = new FireControlAgent();
+  const res = agent.selectLowestCostEffector(
+    { rfLinkActive: true, insHardened: false, distanceMeters: 1200, threatCostUsd: 1500 },
+    { laserTransmittance: 0.88 }
+  );
+  assert.equal(res.selectedTier, 1);
+  assert.equal(res.costPerShotUsd, 0.05);
+  assert.equal(res.effectorId, 'ANDURIL-PULSAR-EW');
+});
+
+test('FireControlAgent: Tier-2 ($1.50 50kW Laser) selected for INS threat in clear atmosphere', () => {
+  const agent = new FireControlAgent();
+  const res = agent.selectLowestCostEffector(
+    { rfLinkActive: false, insHardened: true, distanceMeters: 2100 },
+    { laserTransmittance: 0.88 }
+  );
+  assert.equal(res.selectedTier, 2);
+  assert.equal(res.costPerShotUsd, 1.50);
+  assert.equal(res.effectorId, 'DE-SHORAD-HEL-50KW');
+});
+
+test('FireControlAgent: Tier-3 ($4,800 Aetheris Kinetic) selected when Arctic blizzard blocks laser', () => {
+  const agent = new FireControlAgent();
+  const res = agent.selectLowestCostEffector(
+    { rfLinkActive: false, insHardened: true, distanceMeters: 1800 },
+    { laserTransmittance: 0.25 } // Arctic blowing snow
+  );
+  assert.equal(res.selectedTier, 3);
+  assert.equal(res.costPerShotUsd, 4800);
+  assert.equal(res.effectorId, 'AETHERIS-INTERCEPTOR-MK2');
+});
+
+test('FireControlAgent: resetBattery restores all 4 pods to 4 rounds (16 total)', () => {
+  const agent = new FireControlAgent();
+  agent.dischargeEffector('POD-A');
+  agent.dischargeEffector('POD-B');
+  assert.equal(agent.battery['POD-A'].count, 3);
+  agent.resetBattery();
+  assert.equal(agent.battery['POD-A'].count, 4);
+  assert.equal(agent.battery['POD-B'].count, 4);
+});
+
+test('ExtremeClimateAgent: ARCTIC (-45C) disables Directed Energy and applies thermal pre-heater physics', () => {
+  const climate = new ExtremeClimateAgent({ thermalJacketEnabled: false });
+  const unheated = climate.setTheater('ARCTIC');
+  assert.equal(unheated.ambientTempC, -45);
+  assert.equal(unheated.directedEnergyViable, false);
+  assert.equal(unheated.effectiveBatteryFactor, 0.68);
+
+  const heated = climate.evaluateEnvironment({ theaterId: 'ARCTIC', thermalPreheater: true });
+  assert.equal(heated.effectiveBatteryFactor, 0.94);
+});
+
+test('ExtremeClimateAgent: ARCHIPELAGO models sea-skimming multipath and typhoon crosswind lead', () => {
+  const climate = new ExtremeClimateAgent();
+  const env = climate.setTheater('ARCHIPELAGO');
+  assert.equal(env.theaterId, 'ARCHIPELAGO');
+  assert.ok(env.radarMultipathFactor > 1.2);
+  assert.ok(env.windDriftCompensationDeg > 5.0);
+  assert.equal(env.directedEnergyViable, false); // 0.58 salt-fog transmittance < 0.65
+});
+
+test('ExtremeClimateAgent: SPACE_HIGH_ALT handles 0% GPS lock via VIO + LeoPNT and favors laser', () => {
+  const climate = new ExtremeClimateAgent();
+  const env = climate.setTheater('SPACE_HIGH_ALT');
+  assert.equal(env.gpsDenied, true);
+  assert.equal(env.navigationMode, 'VIO_STAR_TRACKER_LEOPNT');
+  assert.equal(env.directedEnergyViable, true); // 0.96 stratospheric transmittance
+});
+
+test('ExtremeClimateAgent: SUBTERRANEAN caps LOS to 180m and switches to Acoustic + Fiber-Optic mode', () => {
+  const climate = new ExtremeClimateAgent();
+  const env = climate.setTheater('SUBTERRANEAN');
+  assert.equal(env.maxLineOfSightM, 180);
+  assert.equal(env.effectiveInterceptorRangeM, 180);
+  assert.equal(env.navigationMode, 'LIDAR_SLAM_FIBER_OPTIC_TETHER');
+});
+
+test('MosaAdapterAgent: pre-loads 5 open-system COTS modules and exports IBCS/FAAD C2 bundle', () => {
+  const mosa = new MosaAdapterAgent();
+  assert.equal(mosa.listModules().length, 5);
+  const bundle = mosa.exportMosaBundle();
+  assert.equal(bundle.vendorLockInCount, 0);
+  assert.ok(bundle.statutoryCompliance.includes('10 U.S.C.'));
+});
+
+test('MosaAdapterAgent: accepts compliant startup sensor and rejects proprietary vendor lock-in', () => {
+  const mosa = new MosaAdapterAgent();
+  const rejected = mosa.registerModule({
+    moduleId: 'LEGACY-LOCKED-RADAR',
+    vendor: 'OldPrime Corp',
+    category: 'SENSOR',
+    protocol: 'COT_MIL_STD_2525C',
+    vendorLockIn: true
+  });
+  assert.equal(rejected.accepted, false);
+  assert.ok(rejected.reason.includes('MOSA_VIOLATION_PROPRIETARY_LOCK_IN'));
+
+  const accepted = mosa.registerModule({
+    moduleId: 'YC-ACOUSTIC-ARRAY-01',
+    vendor: 'Aetheris Acoustic Partner',
+    category: 'SENSOR',
+    protocol: 'SOSA_1_0',
+    unitCostUsd: 4200,
+    vendorLockIn: false
+  });
+  assert.equal(accepted.accepted, true);
+  assert.equal(mosa.listModules('SENSOR').length, 2);
+});
+
+test('ContestedLogisticsAgent: forecasts Time-to-Winchester and fabricates 3D-printed interceptors', () => {
+  const logistics = new ContestedLogisticsAgent();
+  const fire = new FireControlAgent();
+  const state = logistics.evaluateLogisticsState(fire.battery, 16);
+  assert.equal(state.totalLoadedRounds, 16);
+  assert.equal(state.timeToWinchesterMinutes, 60);
+
+  const fab = logistics.fabricateInterceptors(4); // 4 hrs * 1.5/hr = 6 interceptors
+  assert.equal(fab.success, true);
+  assert.equal(fab.producedCount, 6);
+  assert.equal(fab.assembledReserveStock, 18); // 12 initial + 6 fabricated
+});
+
+test('ContestedLogisticsAgent: dispatches TRV-150 cargo UAS to reload depleted launcher pods', () => {
+  const logistics = new ContestedLogisticsAgent();
+  const fire = new FireControlAgent();
+  fire.dischargeEffector('POD-A');
+  fire.dischargeEffector('POD-A');
+  fire.dischargeEffector('POD-C');
+  assert.equal(fire.battery['POD-A'].count, 2);
+  assert.equal(fire.battery['POD-C'].count, 3);
+
+  const sortie = logistics.dispatchAutonomousResupply(fire.battery);
+  assert.equal(sortie.resupplyDispatched, true);
+  assert.equal(sortie.totalRoundsDelivered, 3);
+  assert.equal(fire.battery['POD-A'].count, 4);
+  assert.equal(fire.battery['POD-C'].count, 4);
+  assert.equal(sortie.totalLoadedAfter, 16);
+});
+
+test('MasterRouterSwarm: orchestrates all 4 US Army YC RFS pillars end-to-end with Merkle audit', () => {
+  const swarm = new MasterRouterSwarm();
+
+  // 1. Switch to ARCTIC theater (-45C blizzard blocks laser -> forces Tier-3 Kinetic $4,800)
+  const arctic = swarm.setOperationalTheater('ARCTIC');
+  assert.equal(arctic.theaterId, 'ARCTIC');
+
+  const engagement = swarm.executeTieredIntercept({
+    targetId: 'TRK-ARCTIC-SHAHED',
+    rfLinkActive: false,
+    insHardened: true,
+    azimuthDeg: 45,
+    distanceMeters: 1500
+  });
+  assert.equal(engagement.tieredDecision.selectedTier, 3);
+  assert.equal(engagement.podDischarge.podId, 'POD-A');
+  assert.equal(engagement.logistics.totalLoadedRounds, 15);
+
+  // 2. Register a commercial MOSA plugin
+  const plugin = swarm.registerCommercialPlugin({
+    moduleId: 'AETHERIS-SUBTERRANEAN-LIDAR',
+    vendor: 'Aetheris Spatial',
+    category: 'SENSOR',
+    protocol: 'MAVLINK_V2',
+    vendorLockIn: false
+  });
+  assert.equal(plugin.accepted, true);
+
+  // 3. Autonomous TRV-150 resupply reloads POD-A back to 16/16
+  const resupply = swarm.triggerAutonomousResupply('POD-A');
+  assert.equal(resupply.totalRoundsDelivered, 1);
+  assert.equal(resupply.totalLoadedAfter, 16);
+
+  // 4. Verify SHA-256 Merkle chain integrity holds across all RFS actions
+  assert.equal(swarm.agentShield.verifyAuditChain(), true);
+  swarm.cotStream.close();
 });
 

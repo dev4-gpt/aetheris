@@ -15,11 +15,14 @@ import { CotStreamAgent } from './cotStreamAgent.js';
 import { RadarFenceAgent } from './radarFenceAgent.js';
 import { AdsbBridge } from './adsbBridge.js';
 import { AarReplayEngine } from './aarReplayEngine.js';
+import { ExtremeClimateAgent } from './extremeClimateAgent.js';
+import { MosaAdapterAgent } from './mosaAdapterAgent.js';
+import { ContestedLogisticsAgent } from './contestedLogisticsAgent.js';
 
 export class MasterRouterSwarm {
   constructor(options = {}) {
     this.name = 'MasterRouterSwarm';
-    this.version = 'v3.0-DEFENSE-SWARM';
+    this.version = 'v4.0-ARMY-MOSA-SWARM';
     
     // Initialize specialist subagents
     this.radarLOS = new RadarLOSAgent(options.radarOptions);
@@ -32,6 +35,11 @@ export class MasterRouterSwarm {
     this.cotStream = new CotStreamAgent(options.cotOptions);
     this.radarFence = new RadarFenceAgent(options.fenceOptions);
     this.adsbBridge = new AdsbBridge(options.adsbOptions);
+
+    // US Secretary of the Army YC RFS Specialist Agents (MOSA, Extreme Climates, Contested Logistics)
+    this.extremeClimate = new ExtremeClimateAgent(options.climateOptions);
+    this.mosaAdapter = new MosaAdapterAgent(options.mosaOptions);
+    this.contestedLogistics = new ContestedLogisticsAgent(options.logisticsOptions);
 
     this.eventLog = [];
     this.subscribers = new Set();
@@ -341,4 +349,99 @@ export class MasterRouterSwarm {
   assessRadarFence(scenario = {}) {
     return this.radarFence.assessFence(scenario);
   }
+
+  /**
+   * Switches the active MIL-STD-810H operational theater (ARCTIC, ARCHIPELAGO,
+   * SPACE_HIGH_ALT, SUBTERRANEAN, or TEMPERATE) and logs the change to the Merkle ledger.
+   *
+   * @param {string} theaterId
+   * @returns {Object} Environmental physics & survival profile
+   */
+  setOperationalTheater(theaterId) {
+    const profile = this.extremeClimate.setTheater(theaterId);
+    this.agentShield.recordAuditEvent(this.operatorClearance, 'THEATER_CLIMATE_UPDATED', {
+      theaterId: profile.theaterId,
+      ambientTempC: profile.ambientTempC,
+      laserTransmittance: profile.laserTransmittance,
+      navigationMode: profile.navigationMode
+    });
+    this.broadcast('ExtremeClimateAgent', 'THEATER_CHANGED', profile);
+    return profile;
+  }
+
+  /**
+   * Executes the US Army YC RFS Multi-Tier Cost-Per-Kill Waterfall:
+   * Evaluates current MIL-STD-810H theater physics, selects the lowest-cost viable
+   * effector ($0.05 EW Jammer, $1.50 50kW Laser, or $4,800 Kinetic Interceptor),
+   * and records the engagement in the Merkle ledger.
+   *
+   * @param {Object} [threat]
+   * @returns {Object} Tiered engagement result & logistics status
+   */
+  executeTieredIntercept(threat = {}) {
+    const climate = this.extremeClimate.evaluateEnvironment();
+    const tieredDecision = this.fireControl.selectLowestCostEffector(threat, climate);
+
+    let podDischarge = null;
+    if (tieredDecision.selectedTier === 3) {
+      const podSelection = this.fireControl.selectOptimalPod(threat.azimuthDeg ?? 48);
+      if (podSelection.available) {
+        podDischarge = this.fireControl.dischargeEffector(podSelection.podId);
+      }
+    }
+
+    const logistics = this.contestedLogistics.evaluateLogisticsState(this.fireControl.battery);
+
+    this.agentShield.recordAuditEvent(this.operatorClearance, 'TIERED_COST_KILL_ENGAGED', {
+      tier: tieredDecision.selectedTier,
+      effectorId: tieredDecision.effectorId,
+      costPerShotUsd: tieredDecision.costPerShotUsd,
+      theaterId: climate.theaterId
+    });
+
+    const result = {
+      climate,
+      tieredDecision,
+      podDischarge,
+      logistics
+    };
+
+    this.broadcast('FireControlAgent', 'TIERED_INTERCEPT_EXECUTED', result);
+    return result;
+  }
+
+  /**
+   * Hot-plugs a commercial sensor, effector, or comms payload into the US Army MOSA registry.
+   * @param {Object} manifest
+   * @returns {Object} Registration outcome
+   */
+  registerCommercialPlugin(manifest) {
+    const res = this.mosaAdapter.registerModule(manifest);
+    this.agentShield.recordAuditEvent(
+      this.operatorClearance,
+      res.accepted ? 'MOSA_MODULE_HOT_PLUGGED' : 'MOSA_MODULE_REJECTED',
+      { moduleId: manifest?.moduleId, accepted: res.accepted, protocol: manifest?.protocol }
+    );
+    this.broadcast('MosaAdapterAgent', res.accepted ? 'MOSA_PLUGIN_ONLINE' : 'MOSA_PLUGIN_REJECTED', res);
+    return res;
+  }
+
+  /**
+   * Dispatches an autonomous TRV-150 Tactical Cargo UAS from the FOB 3D Micro-Factory
+   * to reload depleted kinetic interceptor pods.
+   *
+   * @param {string} [targetPodId]
+   * @returns {Object} Resupply sortie telemetry
+   */
+  triggerAutonomousResupply(targetPodId = null) {
+    const resupply = this.contestedLogistics.dispatchAutonomousResupply(this.fireControl.battery, targetPodId);
+    this.agentShield.recordAuditEvent(this.operatorClearance, 'AUTONOMOUS_UAS_RESUPPLY_COMPLETED', {
+      platform: resupply.platform,
+      totalRoundsDelivered: resupply.totalRoundsDelivered,
+      totalLoadedAfter: resupply.totalLoadedAfter
+    });
+    this.broadcast('ContestedLogisticsAgent', 'PODS_RESUPPLIED', resupply);
+    return resupply;
+  }
 }
+

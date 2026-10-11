@@ -438,33 +438,89 @@
     <!-- Right Panel: Sensor-to-Shooter & Low-Cost Interceptor Fire Control (YC RFS) -->
     <aside class="w-88 border-l border-cyan-500/20 bg-[#060a14]/95 p-4 flex flex-col gap-3.5 overflow-y-auto z-20 text-xs">
       
-      <!-- Asymmetric Cost Per Kill Calculator (YC RFS Defense Thesis) -->
+      <!-- Asymmetric Cost Per Kill Waterfall (US Army YC RFS Defense Thesis) -->
       <div class="glass-panel rounded-xl p-3.5 flex flex-col gap-2.5 border-emerald-500/40">
         <div class="flex items-center justify-between border-b border-emerald-500/30 pb-2">
           <span class="font-semibold text-emerald-400 tracking-wide flex items-center gap-1.5 mono">
             <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            ASYMMETRIC COST PER KILL
+            TIERED COST PER KILL
           </span>
-          <span class="mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">YC RFS</span>
+          <span class="mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">US ARMY YC RFS</span>
         </div>
 
         <div class="flex flex-col gap-1.5 mono text-[11px]">
           <div class="flex justify-between text-slate-400">
-            <span>Legacy Interceptor (Patriot PAC-3):</span>
+            <span>Legacy Baseline (Patriot PAC-3):</span>
             <span class="text-rose-400 font-bold">$3,400,000</span>
           </div>
           <div class="flex justify-between text-slate-400">
-            <span>Incoming Threat (Shahed-136):</span>
-            <span class="text-amber-400 font-bold">$22,000</span>
+            <span>Tier 1 · RF/Cyber Jammer (Pulsar):</span>
+            <span class="text-cyan-300 font-bold">$0.05 / SHOT</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Tier 2 · 50kW DE Laser (HEL):</span>
+            <span class="text-amber-300 font-bold">$1.50 / SHOT</span>
           </div>
           <div class="flex justify-between text-slate-400 pt-1 border-t border-slate-800">
-            <span>Aetheris Kinetic Interceptor:</span>
+            <span>Tier 3 · Aetheris Kinetic Interceptor:</span>
             <span class="text-emerald-400 font-bold">$4,800 (ATTRITABLE)</span>
           </div>
           <div class="flex justify-between text-slate-400">
-            <span>Cost Advantage per Engagement:</span>
-            <span class="text-cyan-300 font-bold">99.85% SAVINGS</span>
+            <span>Active Waterfall Selection:</span>
+            <span id="hud-active-effector-tier" class="text-cyan-300 font-bold">TIER 2 ($1.50) · 99.85%+ SAVED</span>
           </div>
+        </div>
+      </div>
+
+      <!-- US Secretary of the Army YC RFS: Multi-Theater Extremes, MOSA & Contested Logistics -->
+      <div class="glass-panel rounded-xl p-3.5 flex flex-col gap-2.5 border-cyan-500/40">
+        <div class="flex items-center justify-between border-b border-cyan-500/30 pb-1.5">
+          <span class="font-semibold text-cyan-300 tracking-wide flex items-center gap-1.5 mono text-[11px]">
+            <span>🌐</span> MULTI-THEATER & MOSA C2
+          </span>
+          <span id="hud-theater-badge" class="mono text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-200">MIL-STD-810H</span>
+        </div>
+
+        <!-- 4 Extreme Theaters Selector (Arctic, Archipelago, Space, Subterranean) -->
+        <div class="grid grid-cols-2 gap-1 mono text-[9px]">
+          <button id="btn-theater-arctic" data-theater="ARCTIC" class="py-1.5 px-2 rounded bg-slate-900/90 border border-cyan-500/40 text-cyan-200 hover:bg-cyan-500/20 transition-all cursor-pointer text-left">
+            ❄️ ARCTIC (-45°C)
+          </button>
+          <button id="btn-theater-archipelago" data-theater="ARCHIPELAGO" class="py-1.5 px-2 rounded bg-slate-900/90 border border-teal-500/40 text-teal-200 hover:bg-teal-500/20 transition-all cursor-pointer text-left">
+            🌊 ARCHIPELAGO
+          </button>
+          <button id="btn-theater-space" data-theater="SPACE_HIGH_ALT" class="py-1.5 px-2 rounded bg-slate-900/90 border border-purple-500/40 text-purple-200 hover:bg-purple-500/20 transition-all cursor-pointer text-left">
+            🛰️ SPACE / EW-DENIED
+          </button>
+          <button id="btn-theater-subterranean" data-theater="SUBTERRANEAN" class="py-1.5 px-2 rounded bg-slate-900/90 border border-amber-500/40 text-amber-200 hover:bg-amber-500/20 transition-all cursor-pointer text-left">
+            🚇 SUBTERRANEAN
+          </button>
+        </div>
+
+        <!-- Environmental & Logistics Telemetry Readout -->
+        <div class="flex flex-col gap-1 mono text-[10px] bg-black/40 p-2 rounded border border-slate-800">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Climate / Laser τ:</span>
+            <span id="hud-climate-readout" class="text-white font-bold">22°C · τ=0.88 (HEL OK)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">PNT Nav Mode:</span>
+            <span id="hud-pnt-readout" class="text-emerald-300 font-bold">GPS_L1_L2_RTK</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Magazine / 3D Factory:</span>
+            <span id="hud-logistics-readout" class="text-amber-300 font-bold">16/16 PODS · 12 RESERVE</span>
+          </div>
+        </div>
+
+        <!-- Contested Logistics Resupply & MOSA Open-System Actions -->
+        <div class="grid grid-cols-2 gap-1.5 mono text-[9px]">
+          <button id="btn-resupply-pods" class="py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-400/60 text-emerald-200 hover:bg-emerald-900/60 font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer" title="Dispatch Autonomous TRV-150 Cargo UAS from FOB 3D Micro-Factory">
+            <span>🚁</span> TRV-150 RESUPPLY
+          </button>
+          <button id="btn-export-mosa" class="py-1.5 rounded-lg bg-indigo-950/70 border border-indigo-400/60 text-indigo-200 hover:bg-indigo-900/60 font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer" title="Export US Army MOSA / SOSA / IBCS Open-System Manifest">
+            <span>🔌</span> MOSA MANIFEST
+          </button>
         </div>
       </div>
 
@@ -1386,6 +1442,93 @@
         document.getElementById('btn-toggle-daylight').textContent = "☀️ NIGHT/DAY FLIR";
       }
     });
+
+    // US Secretary of the Army YC RFS: 4-Theater Extreme Climate Switcher, Contested Logistics & MOSA
+    const theaterButtons = [
+      document.getElementById('btn-theater-arctic'),
+      document.getElementById('btn-theater-archipelago'),
+      document.getElementById('btn-theater-space'),
+      document.getElementById('btn-theater-subterranean')
+    ];
+
+    theaterButtons.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        const theaterId = btn.getAttribute('data-theater');
+        const profile = swarm.setOperationalTheater(theaterId);
+        const tiered = swarm.fireControl.selectLowestCostEffector(
+          { rfLinkActive: false, insHardened: true, distanceMeters: 1800 },
+          profile
+        );
+
+        // Update 3D Three.js atmospheric fog & background to match theater physics
+        if (profile.sceneAtmosphere) {
+          scene.background = new THREE.Color(profile.sceneAtmosphere.fogColor);
+          scene.fog.color = new THREE.Color(profile.sceneAtmosphere.fogColor);
+          hemiLight.intensity = profile.sceneAtmosphere.ambientIntensity;
+        }
+
+        const badgeEl = document.getElementById('hud-theater-badge');
+        if (badgeEl) badgeEl.textContent = profile.theaterId;
+
+        const climateEl = document.getElementById('hud-climate-readout');
+        if (climateEl) {
+          climateEl.textContent = `${profile.ambientTempC}°C · τ=${profile.laserTransmittance} (${profile.directedEnergyViable ? 'HEL OK' : 'HEL BLOCKED'})`;
+        }
+
+        const pntEl = document.getElementById('hud-pnt-readout');
+        if (pntEl) pntEl.textContent = profile.navigationMode;
+
+        const tierEl = document.getElementById('hud-active-effector-tier');
+        if (tierEl) {
+          tierEl.textContent = `TIER ${tiered.selectedTier} ($${tiered.costPerShotUsd}) · ${tiered.effectorId}`;
+        }
+
+        if (window.appendSwarmEvent) {
+          window.appendSwarmEvent(
+            `[ExtremeClimate] ${profile.theaterName} (${profile.milStdCompliance}) → Tier ${tiered.selectedTier} ${tiered.effectorId} ($${tiered.costPerShotUsd}/shot)`,
+            'text-cyan-300'
+          );
+        }
+      });
+    });
+
+    const btnResupply = document.getElementById('btn-resupply-pods');
+    if (btnResupply) {
+      btnResupply.addEventListener('click', () => {
+        const sortie = swarm.triggerAutonomousResupply();
+        const logEl = document.getElementById('hud-logistics-readout');
+        if (logEl) {
+          logEl.textContent = `${sortie.totalLoadedAfter}/16 PODS · ${sortie.remainingReserveStock} RESERVE`;
+        }
+        if (window.appendSwarmEvent) {
+          window.appendSwarmEvent(
+            `[ContestedLogistics] ${sortie.platform} delivered ${sortie.totalRoundsDelivered} rounds (${sortie.totalLoadedAfter}/16 ready, ${sortie.remainingReserveStock} in 3D Micro-Factory reserve)`,
+            'text-emerald-400'
+          );
+        }
+      });
+    }
+
+    const btnExportMosa = document.getElementById('btn-export-mosa');
+    if (btnExportMosa) {
+      btnExportMosa.addEventListener('click', () => {
+        const bundle = swarm.mosaAdapter.exportMosaBundle();
+        const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `aetheris_us_army_mosa_manifest_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        if (window.appendSwarmEvent) {
+          window.appendSwarmEvent(
+            `[MosaAdapter] Exported 10 U.S.C. § 4401 MOSA / SOSA / IBCS manifest (${bundle.totalModules} COTS open modules, 0 vendor lock-in)`,
+            'text-indigo-300'
+          );
+        }
+      });
+    }
 
     // Window Resize
     window.addEventListener('resize', () => {

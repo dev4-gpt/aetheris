@@ -11,9 +11,11 @@ export class FireControlAgent {
     this.name = 'FireControlAgent';
     this.role = 'Sensor-to-Shooter & Kinetic Effector Allocator';
     
-    // Financial and effector parameters
-    this.interceptorCostUsd = 4800; // Aetheris Attritable Kinetic Ram Drone
-    this.patriotCostUsd = 3400000;  // Standard PAC-3 MSE interceptor
+    // Financial and tiered effector parameters (US Army YC RFS Cost-Per-Kill Waterfall)
+    this.ewCostPerShotUsd = 0.05;     // Tier 1: RF Cyber/Protocol Jammer (Anduril Pulsar / COTS EW)
+    this.laserCostPerShotUsd = 1.50;  // Tier 2: 50kW Directed Energy High-Energy Laser (DE M-SHORAD)
+    this.interceptorCostUsd = 4800;   // Tier 3: Aetheris Attritable Kinetic Ram Drone
+    this.patriotCostUsd = 3400000;    // Legacy Baseline: PAC-3 MSE interceptor
     this.shahedThreatCostUsd = 22000; // Shahed-136 loitering munition
     
     // Battery configuration: 4 pods x 4 canisters = 16 kinetic ram effectors
@@ -336,4 +338,74 @@ export class FireControlAgent {
 
     return JSON.stringify(plan, null, 2);
   }
+
+  /**
+   * US Secretary of the Army YC RFS — Multi-Tier Cost-Per-Kill Waterfall Optimizer.
+   * Dynamically selects the lowest-cost physics-viable effector based on threat hardening
+   * and MIL-STD-810H atmospheric transmittance:
+   *   - Tier 1: RF Cyber/Protocol Jammer ($0.05/shot) — for commercial/FPV drones with active RF links
+   *   - Tier 2: 50kW Directed Energy Laser ($1.50/shot) — when atmospheric transmittance >= 0.65 & range <= 3500m
+   *   - Tier 3: Aetheris Kinetic Interceptor ($4,800/shot) — all-weather hard-kill for INS-hardened threats
+   *
+   * @param {Object} [threat]
+   * @param {Object} [climate]
+   * @returns {Object} Selected tier, cost-per-kill economics, and technical rationale
+   */
+  selectLowestCostEffector(threat = {}, climate = {}) {
+    const rfLinkActive = Boolean(threat.rfLinkActive);
+    const insHardened = threat.insHardened ?? !rfLinkActive;
+    const distanceM = Number(threat.distanceMeters ?? 950);
+    const transmittance = Number(climate.laserTransmittance ?? 0.88);
+    const threatCostUsd = Number(threat.threatCostUsd ?? this.shahedThreatCostUsd);
+
+    let selectedTier = 3;
+    let effectorId = 'AETHERIS-INTERCEPTOR-MK2';
+    let effectorType = 'KINETIC_ATTRITABLE_INTERCEPTOR';
+    let costPerShotUsd = this.interceptorCostUsd;
+    let rationale = 'Autonomous INS-guided threat or degraded weather requires all-weather kinetic hard-kill ($4,800).';
+
+    if (rfLinkActive && !insHardened) {
+      selectedTier = 1;
+      effectorId = 'ANDURIL-PULSAR-EW';
+      effectorType = 'RF_CYBER_PROTOCOL_JAMMER';
+      costPerShotUsd = this.ewCostPerShotUsd;
+      rationale = 'Active C2 RF link detected; defeated via Tier-1 Non-Kinetic Protocol Spoofing ($0.05/shot).';
+    } else if (transmittance >= 0.65 && distanceM <= 3500) {
+      selectedTier = 2;
+      effectorId = 'DE-SHORAD-HEL-50KW';
+      effectorType = 'DIRECTED_ENERGY_LASER_50KW';
+      costPerShotUsd = this.laserCostPerShotUsd;
+      rationale = `Clear atmospheric transmittance (${transmittance}) within 3.5km permits Tier-2 50kW Laser burn-through ($1.50/shot).`;
+    }
+
+    const savingsVsPatriotUsd = Number((this.patriotCostUsd - costPerShotUsd).toFixed(2));
+    const savingsVsPatriotPct = Number((((this.patriotCostUsd - costPerShotUsd) / this.patriotCostUsd) * 100).toFixed(5));
+    const costExchangeRatio = Number((threatCostUsd / Math.max(0.01, costPerShotUsd)).toFixed(1));
+
+    return {
+      selectedTier,
+      effectorId,
+      effectorType,
+      costPerShotUsd,
+      threatCostUsd,
+      patriotBaselineUsd: this.patriotCostUsd,
+      savingsVsPatriotUsd,
+      savingsVsPatriotPct,
+      favorableExchangeRatio: `${costExchangeRatio}:1`,
+      atmosphericTransmittance: transmittance,
+      rationale
+    };
+  }
+
+  /**
+   * Resets all 4 launcher pods back to full 4-round readiness (16 total rounds).
+   */
+  resetBattery() {
+    for (const pod of Object.values(this.battery)) {
+      pod.count = 4;
+      pod.ready = true;
+    }
+    return this.battery;
+  }
 }
+
