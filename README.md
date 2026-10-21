@@ -28,7 +28,7 @@ The [WorldClaw feasibility review](WORLDCLAW_FEASIBILITY.md) explains how genera
 
 The [related repositories review](RELATED_REPOS_REVIEW.md) ranks reusable ideas from other `dev4-gpt` projects and records the current CI reliability work.
 
-The [master product and repository plan](AETHERIS_MASTER_PLAN.md) maps the current modules, all 57 public owned repositories, concrete integration points, and the proof gates for a first customer pilot. The account's starred list remains pending because the available GitHub integration does not expose it.
+The [master product and repository plan](AETHERIS_MASTER_PLAN.md) maps the current modules, all 57 public owned repositories, a wider GitHub search of geospatial and 3D tooling, concrete integration points, and the proof gates for a first customer pilot. The account's starred list remains pending because the available GitHub integration does not expose it.
 
 ---
 
