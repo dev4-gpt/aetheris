@@ -26,6 +26,8 @@ The [defense startup readiness review](DEFENSE_STARTUP_READINESS.md) separates t
 
 The [WorldClaw feasibility review](WORLDCLAW_FEASIBILITY.md) explains how generated 3D scenes could support a clearly labeled scenario sandbox. The research repository has not released code or a license, and its generated scenes must not be presented as mapped ground truth.
 
+The [related repositories review](RELATED_REPOS_REVIEW.md) ranks reusable ideas from other `dev4-gpt` projects and records the current CI reliability work.
+
 ---
 
 ## 🌍 Overview: The World is Not a Flat 2D Map
