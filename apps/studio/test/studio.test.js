@@ -120,11 +120,25 @@ test('Studio Route: POST /api/director/script decomposes narrative', async () =>
 
 test('Studio Route: POST /api/benchmark evaluates model', async () => {
   const res = await invokeRoute('POST', '/api/benchmark', {
-    modelId: 'wan-2.1-t2v-14b'
+    modelId: 'wan-2.1-t2v-14b',
+    sampleData: {
+      intendedPoses: [{ pos: [0, 0, 0] }, { pos: [5, 5, 5] }],
+      recoveredPoses: [{ pos: [0.02, 0, 0] }, { pos: [5.01, 5, 4.99] }],
+      groundTruthDepth: [0.2, 0.5, 0.8],
+      estimatedDepth: [0.21, 0.49, 0.81],
+      embeddingShotA: [1, 0], embeddingShotB: [0.99, 0.01]
+    }
   });
 
   assert.equal(res.statusCode, 200);
   const data = res.json();
   assert.equal(data.modelId, 'wan-2.1-t2v-14b');
   assert.ok(data.metrics.compositeWorldGenScore > 80);
+  assert.equal(data.evaluation, 'EXPLORATORY_UNVERIFIED');
+});
+
+test('Studio Route: POST /api/benchmark rejects missing data instead of returning a fixture score', async () => {
+  const res = await invokeRoute('POST', '/api/benchmark', { modelId: 'worldclaw' });
+  assert.equal(res.statusCode, 400);
+  assert.match(res.json().error, /intendedPoses and recoveredPoses/);
 });

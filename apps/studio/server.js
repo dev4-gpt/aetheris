@@ -135,16 +135,11 @@ export async function handleRequest(req, res) {
   if (pathname === '/api/benchmark' && req.method === 'POST') {
     try {
       const payload = await parseJsonBody(req);
-      const evaluation = worldGenBenchmark.evaluateModel(payload.modelId || 'wan-2.1-t2v-14b', {
-        intendedPoses: [{ pos: [0, 0, 0] }, { pos: [5, 5, 5] }],
-        recoveredPoses: [{ pos: [0.02, 0, 0] }, { pos: [5.01, 5.0, 4.99] }],
-        groundTruthDepth: [0.2, 0.5, 0.8],
-        estimatedDepth: [0.21, 0.49, 0.81]
-      });
+      const evaluation = worldGenBenchmark.evaluateModel(payload.modelId || 'unspecified', payload.sampleData);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(evaluation));
     } catch (err) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.writeHead(err instanceof TypeError || err instanceof RangeError ? 400 : 500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: err.message }));
     }
     return;

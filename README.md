@@ -24,6 +24,8 @@
 
 The [defense startup readiness review](DEFENSE_STARTUP_READINESS.md) separates the working geospatial prototype from simulated defense scenarios and lists the evidence needed for customer pilots, open-interface claims, environmental claims, and cost estimates. The [open source adoption note](OPEN_SOURCE_ADOPTION.md) records the free standards and code considered, their licenses, and the new local observation review workflow. The defense screen and its module catalog are research demos; they do not establish Army endorsement, field readiness, standards conformance, or verified cost per kill.
 
+The [WorldClaw feasibility review](WORLDCLAW_FEASIBILITY.md) explains how generated 3D scenes could support a clearly labeled scenario sandbox. The research repository has not released code or a license, and its generated scenes must not be presented as mapped ground truth.
+
 ---
 
 ## 🌍 Overview: The World is Not a Flat 2D Map

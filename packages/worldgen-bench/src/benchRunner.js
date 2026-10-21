@@ -15,9 +15,35 @@ export class WorldGenBenchmark {
   }
 
   evaluateModel(modelId, sampleData) {
-    const cte = computeCameraTrajectoryError(sampleData.intendedPoses || [], sampleData.recoveredPoses || []);
-    const das = computeDepthAlignmentScore(sampleData.groundTruthDepth || [], sampleData.estimatedDepth || []);
-    const csnf = computeCrossShotFidelity(sampleData.embeddingShotA || [1, 0], sampleData.embeddingShotB || [1, 0]);
+    const pairs = [
+      ['intendedPoses', 'recoveredPoses'],
+      ['groundTruthDepth', 'estimatedDepth'],
+      ['embeddingShotA', 'embeddingShotB']
+    ];
+    for (const [left, right] of pairs) {
+      const a = sampleData?.[left];
+      const b = sampleData?.[right];
+      if (!Array.isArray(a) || !Array.isArray(b) || a.length === 0 || a.length !== b.length) {
+        throw new TypeError(`${left} and ${right} must be non-empty arrays of equal length`);
+      }
+    }
+    for (const key of ['intendedPoses', 'recoveredPoses']) {
+      if (!sampleData[key].every((pose) => {
+        const xyz = pose?.pos || pose?.position;
+        return Array.isArray(xyz) && xyz.length === 3 && xyz.every(Number.isFinite);
+      })) throw new TypeError(`${key} must contain finite 3D positions`);
+    }
+    for (const key of ['groundTruthDepth', 'estimatedDepth', 'embeddingShotA', 'embeddingShotB']) {
+      if (!sampleData[key].every(Number.isFinite)) throw new TypeError(`${key} must contain finite numbers`);
+    }
+    for (const key of ['groundTruthDepth', 'estimatedDepth']) {
+      if (!sampleData[key].every((depth) => depth >= 0 && depth <= 1)) {
+        throw new RangeError(`${key} must contain normalized depth values from 0 to 1`);
+      }
+    }
+    const cte = computeCameraTrajectoryError(sampleData.intendedPoses, sampleData.recoveredPoses);
+    const das = computeDepthAlignmentScore(sampleData.groundTruthDepth, sampleData.estimatedDepth);
+    const csnf = computeCrossShotFidelity(sampleData.embeddingShotA, sampleData.embeddingShotB);
 
     // Composite WorldGen Score (0-100)
     // High DAS, Low CTE, High CSNF
@@ -33,7 +59,9 @@ export class WorldGenBenchmark {
         crossShotFidelityCosine: Number(csnf.toFixed(4)),
         compositeWorldGenScore: Number(compositeScore.toFixed(2))
       },
-      evaluation: compositeScore >= 80 ? 'EXCEPTIONAL_SPATIAL_COHERENCE' : 'NOMINAL'
+      evaluation: 'EXPLORATORY_UNVERIFIED',
+      dataStatus: 'user_submitted',
+      limitations: 'Exploratory video metrics; does not establish 3D geometry realism or geographic accuracy.'
     };
   }
 }

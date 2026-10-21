@@ -26,7 +26,13 @@ class StudioApplication {
     const entry = document.createElement('div');
     entry.className = `swarm-entry ${isActive ? 'active' : ''}`;
     const time = new Date().toLocaleTimeString();
-    entry.innerHTML = `<span class="swarm-agent-tag">[${agent}]</span> <span style="color: #64748b;">${time}:</span> ${message}`;
+    const tag = document.createElement('span');
+    tag.className = 'swarm-agent-tag';
+    tag.textContent = `[${agent}]`;
+    const timestamp = document.createElement('span');
+    timestamp.style.color = '#64748b';
+    timestamp.textContent = `${time}:`;
+    entry.append(tag, ' ', timestamp, ' ', String(message));
     this.swarmTerminal.appendChild(entry);
     this.swarmTerminal.scrollTop = this.swarmTerminal.scrollHeight;
   }
@@ -130,21 +136,31 @@ class StudioApplication {
   }
 
   async handleBenchmark() {
-    this.logSwarm('WorldGenBench', `Executing WorldGen-Bench v1.0 spatial consistency test...`, true);
+    const file = document.getElementById('benchSampleFile')?.files?.[0];
+    if (!file) {
+      this.logSwarm('WorldGenBench', 'Choose a JSON file with paired camera, depth, and embedding measurements first. No score has been computed.');
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      this.logSwarm('WorldGenBench', 'Measurement file exceeds the 1 MB limit.');
+      return;
+    }
+    this.logSwarm('WorldGenBench', 'Scoring supplied measurements with exploratory video metrics...', true);
     try {
+      const sampleData = JSON.parse(await file.text());
       const res = await fetch('/api/benchmark', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modelId: document.getElementById('modelSelect')?.value })
+        body: JSON.stringify({ modelId: document.getElementById('modelSelect')?.value, sampleData })
       });
-      const data = res.ok ? await res.json() : null;
-      if (data && data.metrics) {
-        this.logSwarm('WorldGenBench', `Score: ${data.metrics.compositeWorldGenScore}/100 [CTE: ${data.metrics.cameraTrajectoryError}m, Depth Alignment: ${data.metrics.depthAlignmentScorePercent}%]`);
+      const data = await res.json();
+      if (res.ok && data.metrics) {
+        this.logSwarm('WorldGenBench', `Exploratory score from supplied data: ${data.metrics.compositeWorldGenScore}/100 [CTE: ${data.metrics.cameraTrajectoryError}, Depth alignment: ${data.metrics.depthAlignmentScorePercent}%]. This does not validate 3D realism or location accuracy.`);
       } else {
-        this.logSwarm('WorldGenBench', `Score: 92.4/100 [Spatial camera coherence: OPTIMAL]`);
+        this.logSwarm('WorldGenBench', `Cannot score measurements: ${data.error || 'invalid response'}`);
       }
     } catch (err) {
-      this.logSwarm('WorldGenBench', `Local benchmark verified: 91.8/100 composite spatial coherence.`);
+      this.logSwarm('WorldGenBench', `Cannot score measurements: ${err.message}`);
     }
   }
 

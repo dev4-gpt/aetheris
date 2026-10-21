@@ -49,5 +49,16 @@ test('WorldGenBenchmark end-to-end evaluation', () => {
 
   assert.equal(evaluation.modelId, 'wan-2.1-t2v-14b');
   assert.ok(evaluation.metrics.compositeWorldGenScore >= 85.0);
-  assert.equal(evaluation.evaluation, 'EXCEPTIONAL_SPATIAL_COHERENCE');
+  assert.equal(evaluation.evaluation, 'EXPLORATORY_UNVERIFIED');
+  assert.equal(evaluation.dataStatus, 'user_submitted');
+});
+
+test('WorldGenBenchmark does not score absent or mismatched measurements', () => {
+  const bench = new WorldGenBenchmark();
+  assert.throws(() => bench.evaluateModel('example', {}), /intendedPoses and recoveredPoses/);
+  assert.throws(() => bench.evaluateModel('example', {
+    intendedPoses: [{ pos: [0, 0, 0] }], recoveredPoses: [{ pos: [0, 0, 0] }],
+    groundTruthDepth: [0.2], estimatedDepth: [0.2],
+    embeddingShotA: [1, 0], embeddingShotB: [1]
+  }), /embeddingShotA and embeddingShotB/);
 });
