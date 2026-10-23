@@ -112,5 +112,5 @@ export async function buildServer(options = {}) {
 
 if (process.argv[1] && import.meta.url === new URL(`file://${path.resolve(process.argv[1])}`).href) {
   const app = await buildServer();
-  await app.listen({ port: Number(process.env.PORT || 3001), host: '0.0.0.0' });
+  await app.listen({ port: Number(process.env.PORT || 3001), host: process.env.HOST || (process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1') });
 }
