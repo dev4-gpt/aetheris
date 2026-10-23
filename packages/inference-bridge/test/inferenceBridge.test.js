@@ -35,9 +35,9 @@ test('InferenceRouter dispatches jobs to active provider', async () => {
   };
 
   const result = await router.dispatch(job);
-  assert.equal(result.status, 'completed');
+  assert.equal(result.status, 'synthetic');
   assert.equal(result.modelId, 'wan-2.1-t2v-14b');
-  assert.ok(result.output.url.includes('.mp4'));
+  assert.equal(result.output.url, null);
   assert.equal(result.output.spatialConditioningApplied, true);
   assert.equal(result.output.cameraTrajectorySampleCount, 1);
 
@@ -57,14 +57,14 @@ test('InferenceRouter rejects unknown models', async () => {
   );
 });
 
-test('Cloud serverless provider simulation', async () => {
+test('Cloud serverless provider fails closed without an implementation', async () => {
   const cloud = new CloudServerlessProvider({ platform: 'runpod-serverless' });
   const result = await cloud.generate({
     modelId: 'skyreels-v2',
     prompt: 'Dramatic cinematic lighting shot of cybernetic character'
   });
 
-  assert.equal(result.status, 'completed');
+  assert.equal(result.status, 'unavailable');
   assert.equal(result.provider, 'runpod-serverless');
-  assert.ok(result.output.url.includes('skyreels-v2'));
+  assert.equal(result.output, null);
 });

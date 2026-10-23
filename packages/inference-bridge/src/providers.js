@@ -17,7 +17,7 @@ export class OfflineSyntheticProvider {
     const { modelId, prompt, spatialConditioning, duration = 5.0, aspectRatio = '16:9' } = job;
 
     return {
-      status: 'completed',
+      status: 'synthetic',
       jobId: `syn_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       provider: this.name,
       modelId,
@@ -26,8 +26,8 @@ export class OfflineSyntheticProvider {
       duration,
       output: {
         type: job.type || 'video',
-        url: `https://storage.aetheris.ai/media/renders/${modelId}_${Date.now()}.mp4`,
-        previewPosterUrl: `https://storage.aetheris.ai/media/posters/${modelId}_${Date.now()}.jpg`,
+        url: null,
+        previewPosterUrl: null,
         spatialConditioningApplied: !!spatialConditioning,
         depthMapIncluded: !!(spatialConditioning && spatialConditioning.depthBuffer),
         cameraTrajectorySampleCount: spatialConditioning?.cameraPoses?.length || 0,
@@ -36,8 +36,8 @@ export class OfflineSyntheticProvider {
       },
       telemetry: {
         executionMs: executionDuration,
-        vramConsumedMb: 4096,
-        inferenceEngine: 'Wan2GP-Simulated-Opt',
+        vramConsumedMb: 0,
+        inferenceEngine: 'synthetic-no-inference',
         timestamp: new Date().toISOString()
       }
     };
@@ -66,7 +66,7 @@ export class LocalGPUProvider {
         status: 'fallback-offline',
         provider: this.name,
         error: `Local server unreachable at ${this.endpoint}: ${err.message}`,
-        fallbackNotice: 'Switching to high-throughput cloud serverless or synthetic simulator.'
+        fallbackNotice: 'No media was generated. Local GPU service is unavailable.'
       };
     }
   }
@@ -79,26 +79,15 @@ export class CloudServerlessProvider {
   }
 
   async generate(job) {
-    // Dispatches to remote serverless container
-    const startTime = Date.now();
+    // No remote endpoint is implemented. Never return an invented media URL.
     return {
-      status: 'completed',
-      jobId: `cloud_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      status: 'unavailable',
+      jobId: null,
       provider: this.name,
       modelId: job.modelId,
       prompt: job.prompt,
-      output: {
-        type: 'video',
-        url: `https://cloud.aetheris.ai/vault/generations/${job.modelId}_${Date.now()}.mp4`,
-        fps: 24,
-        resolution: job.resolution || '1080p'
-      },
-      telemetry: {
-        executionMs: Date.now() - startTime + 450,
-        cloudRegion: 'us-east-1',
-        gpuType: 'NVIDIA H100 80GB SXM5',
-        timestamp: new Date().toISOString()
-      }
+      output: null,
+      error: 'Cloud inference adapter is not implemented; no media generated.'
     };
   }
 }

@@ -64,14 +64,6 @@ class StudioApplication {
       await this.handleBenchmark();
     });
 
-    const toggleModeBtn = document.getElementById('toggleModeBtn');
-    toggleModeBtn?.addEventListener('click', () => {
-      const label = document.getElementById('activeProviderLabel');
-      if (label) {
-        label.textContent = label.textContent.includes('SERVERLESS') ? 'LOCAL WAN2GP (RTX 4090)' : 'HYBRID SERVERLESS';
-        this.logSwarm('InferenceRouter', `Switched active backend to ${label.textContent}`);
-      }
-    });
   }
 
   async handleGeneration() {
@@ -98,14 +90,15 @@ class StudioApplication {
       });
 
       const data = res.ok ? await res.json() : null;
-      if (data && data.status === 'completed') {
+      if (data && data.status === 'completed' && data.output?.url) {
         this.logSwarm('InferenceRouter', `Render complete! Job ID: ${data.jobId} (Execution: ${data.telemetry?.executionMs || 120}ms)`);
+      } else if (data?.status === 'synthetic') {
+        this.logSwarm('InferenceRouter', 'Synthetic job metadata produced. No video or image artifact was generated.');
       } else {
-        // Local simulation feedback
-        this.logSwarm('InferenceRouter', `Execution verified via local simulation. Media artifact produced.`);
+        this.logSwarm('InferenceRouter', `No media generated: ${data?.error || 'provider unavailable'}`);
       }
     } catch (err) {
-      this.logSwarm('InferenceRouter', `Local preview simulation active: Video render cached.`);
+      this.logSwarm('InferenceRouter', `Generation request failed: ${err.message}`);
     }
   }
 
@@ -127,11 +120,10 @@ class StudioApplication {
         this.logSwarm('VoiceDirectorAgent', `Mapped dialogue to VoxCPM zero-shot vocal cloning.`);
         this.logSwarm('EditorAgent', `Timeline assembled: ${data.assemblyPackage.totalDurationSec}s runtime.`);
       } else {
-        this.logSwarm('ScreenplayAgent', `Scene 1: Wide establishing drone pass created.`);
-        this.logSwarm('CinematographerAgent', `Generated 3D camera spline waypoints.`);
+        this.logSwarm('ScreenplayAgent', 'No script breakdown returned.');
       }
     } catch (err) {
-      this.logSwarm('ScreenplayAgent', `Multi-agent scene breakdown completed locally.`);
+      this.logSwarm('ScreenplayAgent', `Script breakdown failed: ${err.message}`);
     }
   }
 

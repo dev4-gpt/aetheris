@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aetheris | Base resilience planning</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to workspace</a>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">A</span><div><strong>AETHERIS</strong><small>BASE RESILIENCE PLANNING</small></div></div>
+    <div class="top-meta"><span class="badge">UNCLASSIFIED · PUBLIC DATA PILOT</span><span id="userLabel"></span><button id="logoutBtn" class="quiet" hidden>Sign out</button></div>
+  </header>
+
+  <main id="main">
+    <section id="loginPanel" class="login-card" aria-labelledby="loginTitle">
+      <span class="eyebrow">SECURE WORKSPACE</span>
+      <h1 id="loginTitle">Sign in to review the world as evidence.</h1>
+      <p>Use the operator account created for this pilot. The app labels observations, predictions, and scenarios separately.</p>
+      <form id="loginForm">
+        <label>Username<input name="username" autocomplete="username" required value="admin"></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit" class="primary">Sign in</button>
+      </form>
+      <p id="loginError" class="error" role="alert"></p>
+    </section>
+
+    <div id="workspace" hidden>
+      <section class="intro">
+        <div><span class="eyebrow">OPERATIONS / SITUATIONAL REVIEW</span><h1>One picture, every claim traceable.</h1>
+          <p>Explore permitted public observations, inspect their age and source, then save a reviewable planning record.</p></div>
+        <div class="intro-status"><span class="pulse-dot"></span><span id="feedSummary">Select a layer to load observations</span></div>
+      </section>
+      <div class="layout">
+        <aside class="panel layer-panel" aria-labelledby="layerTitle">
+          <div class="panel-heading"><div><span class="eyebrow">01 / SOURCES</span><h2 id="layerTitle">Layer control</h2></div><span id="layerCount" class="count"></span></div>
+          <p class="panel-help">Only selected feeds load. Each layer shows its actual coverage and source state.</p>
+          <div id="layerList" class="layer-list"></div>
+          <div class="panel-note">No layer substitutes simulated records when a provider is down.</div>
+        </aside>
+
+        <section class="panel map-panel" aria-labelledby="mapTitle">
+          <div class="panel-heading"><div><span class="eyebrow">02 / GLOBAL CONTEXT</span><h2 id="mapTitle">Observation map</h2></div><span class="map-legend"><i></i> Current <i></i> Delayed</span></div>
+          <div class="map-wrap"><canvas id="worldMap" role="img" aria-label="Global map showing selected observations"></canvas><div class="map-stamp">NATURAL EARTH · PUBLIC DOMAIN BASE</div></div>
+          <div class="map-footer"><span id="mapStatus">Waiting for a selected layer</span><span>Choose a marker to inspect provenance</span></div>
+        </section>
+
+        <aside class="panel evidence-panel" aria-labelledby="evidenceTitle">
+          <div class="panel-heading"><div><span class="eyebrow">03 / EVIDENCE</span><h2 id="evidenceTitle">Selected observation</h2></div></div>
+          <div id="evidenceDetail" class="evidence-detail"><p class="empty">Select a marker or an observation below.</p></div>
+          <div class="list-heading">Visible observations <span id="observationCount">0</span></div>
+          <div id="observationList" class="observation-list"></div>
+        </aside>
+      </div>
+
+      <div class="lower-layout">
+        <section class="panel terrain-panel" aria-labelledby="terrainTitle">
+          <div class="panel-heading"><div><span class="eyebrow">04 / GROUNDED AREA</span><h2 id="terrainTitle">USGS terrain review</h2></div><span class="tiny-label">INTERPOLATED 3DEP · NOT SURVEYED</span></div>
+          <form id="areaForm" class="inline-form">
+            <label>Latitude<input name="latitude" type="number" step="any" min="24" max="49" value="38.8895" required></label>
+            <label>Longitude<input name="longitude" type="number" step="any" min="-125" max="-66" value="-77.0353" required></label>
+            <label>Radius km<input name="radiusKm" type="number" step="0.1" min="0.2" max="5" value="1" required></label>
+            <label class="check-label"><input name="includeIllustrativeAssets" type="checkbox"> Illustrative planning markers</label>
+            <button class="primary" type="submit">Build area</button>
+          </form>
+          <canvas id="terrainCanvas" role="img" aria-label="Perspective view of a USGS sampled elevation grid"></canvas>
+          <div id="terrainStatus" class="terrain-status">Create a bounded U.S. area to query 25 real elevation values. Generated objects remain separate.</div>
+        </section>
+
+        <section class="panel decision-panel" aria-labelledby="decisionTitle">
+          <div class="panel-heading"><div><span class="eyebrow">05 / HUMAN REVIEW</span><h2 id="decisionTitle">Decision record</h2></div></div>
+          <label class="file-label">Import GeoJSON observations<input id="importFile" type="file" accept=".geojson,.json,application/geo+json,application/json"></label>
+          <p class="muted">Imports need source URL, license, observedAt, and dataClass on each Point feature. Imported claims remain user declared.</p>
+          <form id="decisionForm">
+            <label>Review title<input name="title" maxlength="160" required placeholder="Example: installation access review"></label>
+            <label>Operator note<textarea name="note" maxlength="5000" required placeholder="Record what you observed, what remains uncertain, and the planning decision."></textarea></label>
+            <button type="submit" class="primary">Save decision record</button>
+          </form>
+          <div id="decisionStatus" role="status"></div>
+          <div class="list-heading">Saved records</div><div id="decisionList" class="decision-list"></div>
+        </section>
+      </div>
+      <footer>Source timestamps and rights are shown per item. Scenarios support planning only and are never field observations.</footer>
+    </div>
+  </main>
+</body>
+</html>

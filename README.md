@@ -1,214 +1,36 @@
-<div align="center">
+# Aetheris
 
-<img src="docs/media/social_preview.jpg" alt="Aetheris Spatial Banner" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
+Aetheris is an unclassified base resilience planning prototype. The new pilot workspace reviews public or operator-imported observations, shows source and freshness, builds a bounded U.S. terrain scene from USGS elevation samples, and saves replayable decision records. It is designed for human review; it does not authenticate user-imported claims, provide a surveyed terrain model, or make operational decisions.
 
-# 🌐 AETHERIS SPATIAL
-### Sovereign Planetary Intelligence & Generative 3D World Engine
-**3D geospatial research prototype with labeled synthetic scenarios and a path to permissioned observations**
+## Pilot workspace
 
-[![Live Demo](https://img.shields.io/badge/Live_Production-aetheris--spatial.vercel.app-00f0ff?style=for-the-badge&logo=vercel)](https://aetheris-spatial.vercel.app)
-[![Node Test Suite](https://img.shields.io/badge/Tests-Run%20Locally-10b981?style=for-the-badge&logo=node.js)](https://github.com/dev4-gpt/delightful-hawk)
-[![License: MIT](https://img.shields.io/badge/License-MIT-38bdf8?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Engine: CesiumJS](https://img.shields.io/badge/Engine-CesiumJS%201.124-f59e0b?style=for-the-badge)](https://cesium.com)
-[![Land Scenario](https://img.shields.io/badge/Land_Scenario-Synthetic_Demo-8b5cf6?style=for-the-badge)](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md)
+Requires Node.js 24.14 or newer. The gateway dependencies are locked in `apps/gateway/package-lock.json`.
 
----
-
-### [🚀 Try Live Production Deployment](https://aetheris-spatial.vercel.app) · [🎥 Watch 1080p Walkthrough Video](docs/media/aetheris_gtm_product_walkthrough.mp4) · [📖 Architecture Paper](WHITE_PAPER_AETHERIS_WORLD_ENGINE.md)
-
-</div>
-
----
-
-## Defense prototype status
-
-The [defense startup readiness review](DEFENSE_STARTUP_READINESS.md) separates the working geospatial prototype from simulated defense scenarios and lists the evidence needed for customer pilots, open-interface claims, environmental claims, and cost estimates. The [open source adoption note](OPEN_SOURCE_ADOPTION.md) records the free standards and code considered, their licenses, and the new local observation review workflow. The defense screen and its module catalog are research demos; they do not establish Army endorsement, field readiness, standards conformance, or verified cost per kill.
-
-The [WorldClaw feasibility review](WORLDCLAW_FEASIBILITY.md) explains how generated 3D scenes could support a clearly labeled scenario sandbox. The research repository has not released code or a license, and its generated scenes must not be presented as mapped ground truth.
-
-The [related repositories review](RELATED_REPOS_REVIEW.md) ranks reusable ideas from other `dev4-gpt` projects and records the current CI reliability work.
-
-The [master product and repository plan](AETHERIS_MASTER_PLAN.md) maps the current modules, all 57 public owned repositories, a wider GitHub search of geospatial and 3D tooling, concrete integration points, and the proof gates for a first customer pilot. The account's starred list remains pending because the available GitHub integration does not expose it.
-
-The [AlphaEarth, OSIRIS, and WorldClaw review](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md) checks current access and reuse terms, identifies the synthetic AlphaEarth placeholder in this repo, and gives concrete trials for real annual embeddings, permitted feed adapters, and a separate 3D scenario workspace.
-
----
-
-## 🌍 Overview: The World is Not a Flat 2D Map
-
-Modern defense commands, aerospace operations, and critical infrastructure operators face acute cognitive overload. Traditional GIS tools project high-velocity orbital assets, ballistic arcs, supersonic flights, and subsea cables onto flat 2D Mercator projections—introducing severe geometric distortion and dangerous blind spots.
-
-**Aetheris Spatial** solves this with an open-source, sovereign, browser-native **3D WGS84 Planetary Digital Twin** running at 60 fps in WebGL:
-
-* **14 Ingested Telemetry Streams**: OpenSky civilian flights, military combat vectors, CelesTrak NORAD satellite orbits, NASA FIRMS active thermal fires, AIS maritime vessels, USGS earthquakes, and TomTom traffic heatmaps.
-* **Synthetic land scenario**: Generates coordinate-seeded example cells and illustrative scores for interface testing. It does not ingest Google AlphaEarth embeddings or measure parcel hazards. A real annual-embedding trial is described in the [source review](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md).
-* **Antigravity Autonomous Subagent Swarm**: Hierarchical multi-agent mesh (Orbital, Subsea, Grid, and Red-Team Audit) dispatches parallel tactical reconnaissance via single-stroke `/patrol`, `/defcon`, and `/audit` slash commands.
-* **High-Fidelity 3D PBR Urban Architecture**: Crystal-clear Google Photorealistic 3D Tiles streaming centimeter-level photogrammetry across Austin, San Francisco, New York, Tokyo, London, Paris, Dubai, and Gurgaon with automated street-level CCTV viewshed projections.
-* **Multi-Spectrum Shaders**: Instant single-key switching across FLIR False-Color Thermal (`4`), Green Phosphor Night Vision (`3`), CRT Surveillance (`2`), and Sobel Edge Detection (`5`).
-
----
-
-## 📸 Production Interface & Capabilities
-
-### 1. Austin C2 Hub & Texas State Capitol (Google 3D Photoreal Tiles)
-Unobstructed 4K photogrammetric geometry streaming in the browser with tactical HUD, scenes director, and sub-millisecond voice operator.
-
-<div align="center">
-  <img src="docs/media/hero_austin_capitol.png" alt="Aetheris Spatial Texas State Capitol" width="100%" style="border-radius: 8px; border: 1px solid #334155;" />
-</div>
-
----
-
-### 2. Synthetic land scenario
-Shows nominal 10 m display cells and example scores. The image and existing walkthrough show a prototype presentation, not Google AlphaEarth model output or measured flood, fire, or soil assessments.
-
-<div align="center">
-  <img src="docs/media/alphaearth_deepmind.png" alt="Synthetic land-scenario interface capture" width="100%" style="border-radius: 8px; border: 1px solid #334155;" />
-</div>
-
----
-
-### 3. Five Interactive Enterprise Mission Cartridges
-
-Aetheris features 5 hot-swappable domain cartridges accessible via the tactile Cartridge Switcher widget in the upper-right viewport:
-
-| Cartridge | Domain Theater | Operational Mission |
-| :--- | :--- | :--- |
-| **`🌱 Land Demo`** | Example locations (Austin / Amazon / Polar) | Synthetic, coordinate-seeded scenario cells; no AlphaEarth data, SAR measurement, or validated lead time. |
-| **`⚓ SentinelMesh`** | North Atlantic (TAT-14 Corridor) | Transatlantic subsea fiber optic cable defense, anchor-drag detection, and AIS dark-vessel loitering intercepts. |
-| **`🛰️ OrbitalOps`** | Low Earth Orbit (LEO 420km) | High-conjunction satellite collision prediction (ISS vs. Cosmos debris within 2.18 km radius). |
-| **`⚡ GridTwin`** | PJM Interconnection (Loudoun County) | 765kV electrical substation thermal stress vs. generative AI datacenter cluster load. |
-| **`🔥 GeoRisk`** | West Coast Wildfire Corridors | NASA VIIRS real-time thermal fire anomalies with evacuation route wind vector projections. |
-
-<div align="center">
-  <img src="docs/media/sentinel_mesh.png" alt="SentinelMesh Subsea Cable Defense" width="48%" style="border-radius: 6px; border: 1px solid #334155; margin-right: 2%;" />
-  <img src="docs/media/orbital_ops.png" alt="OrbitalOps Satellite Defense" width="48%" style="border-radius: 6px; border: 1px solid #334155;" />
-</div>
-<div align="center" style="margin-top: 10px;">
-  <img src="docs/media/grid_twin.png" alt="GridTwin Infrastructure Power Grid" width="48%" style="border-radius: 6px; border: 1px solid #334155; margin-right: 2%;" />
-  <img src="docs/media/geo_risk.png" alt="GeoRisk Thermal Wildfire Tracking" width="48%" style="border-radius: 6px; border: 1px solid #334155;" />
-</div>
-
----
-
-## 🎥 Master Walkthrough Video Included in Repo
-
-The complete 1080p 60fps cinematic video demonstration with voiceover is committed directly inside this repository:
-
-* **File Location**: [`docs/media/aetheris_gtm_product_walkthrough.mp4`](docs/media/aetheris_gtm_product_walkthrough.mp4)
-* **Duration**: 2 minutes, 33 seconds
-* **Resolution**: 1920×1080 Progressive, 30fps H.264 / AAC 48kHz Stereo
-
----
-
-## 📂 Unified Monorepo Architecture
-
-[`dev4-gpt/delightful-hawk`](https://github.com/dev4-gpt/delightful-hawk) is a single, zero-submodule monorepo orchestrated with **pnpm** and **Turborepo**:
-
-```
-delightful-hawk/
-├── gods-eye-view/                 # 🌐 The Core 3D Cesium Spatial C2 Platform
-│   ├── src/                       # 3D modules, shaders, landmarks, HUD, Copilot
-│   │   ├── landmarks3d.js         # PBR 3D skyscrapers & Google 3D tile overrides
-│   │   ├── modules/               # Cartridge registry, AlphaEarth, SentinelMesh
-│   │   │   ├── alphaEarthCartridge.js
-│   │   │   ├── sentinelMeshCartridge.js
-│   │   │   ├── orbitalOpsCartridge.js
-│   │   │   ├── gridTwinCartridge.js
-│   │   │   └── geoRiskCartridge.js
-│   │   └── ai/                    # Autonomous Subagent Mesh & SITREP engines
-│   ├── api/                       # Vercel serverless proxy functions (OpenSky, CelesTrak, CCTV)
-│   ├── public/                    # 3D GLB models, PBR textures, vector tiles
-│   └── package.json               # 2,746 standalone unit tests
-├── apps/
-│   ├── gateway/                   # ⚡ Real-Time Fastify & WebSocket Telemetry Bridge
-│   └── studio/                    # 🎬 Generative Cinema & World Simulation Studio
-├── packages/
-│   ├── spatial-grounding/         # 📐 6-DOF Spline Trajectories & Camera Conditioning
-│   ├── director-swarm/            # 🤖 Autonomous Multi-Agent Director Coordination
-│   ├── inference-bridge/          # 🌉 Wan 2.1 & SkyReels V2 Model Interface
-│   ├── security-shield/           # 🛡️ AgentShield Cryptographic Prompt-Injection Defense
-│   └── worldgen-bench/            # 📊 Camera Trajectory & Depth Alignment Benchmark
-├── docs/
-│   └── media/                     # 🎥 1080p Walkthrough video, social preview, screenshots
-├── turbo.json                     # Monorepo build pipeline
-└── pnpm-workspace.yaml            # Workspace configuration
-```
-
----
-
-## ⚡ Quick Start
-
-### Prerequisites
-* Node.js `>= 24.14.0` (calibrated on Node 24/26)
-* pnpm `>= 9.15.0`
-
-### 1. Clone & Install
 ```bash
-git clone https://github.com/dev4-gpt/delightful-hawk.git
-cd delightful-hawk
-pnpm install
+cd apps/gateway
+npm ci
+AETHERIS_ADMIN_PASSWORD='choose-a-unique-password-at-least-14-characters' \
+  AETHERIS_DB_PATH="$PWD/pilot-data/aetheris.db" npm start
 ```
 
-### 2. Run the 3D Geospatial Console
+Open `http://localhost:3001`. The bootstrap username is `admin`. Use HTTPS for any remote deployment; secure session cookies are enabled when `NODE_ENV=production`. The pilot uses no paid model API. It needs internet access to the named public sources and USGS elevation service.
+
+The workspace has six feed adapters: USGS earthquakes, NASA EONET events, NWS alerts, CelesTrak orbital elements, Fintraffic AIS for Finnish waters, and GDELT article metadata. Providers can be down, rate limited, sparse, or delayed. Flight, CCTV, and other permission-gated layers show their state without invented records. The full live-platform release remains blocked until every required source has verified rights and a tested working adapter.
+
+The elevation scene requests 25 interpolated USGS 3DEP samples in a contiguous-U.S. area up to 5 km radius. The perspective mesh is a planning visualization, not surveyed geometry. WorldClaw informs the structured scene and review process; its repository does not publish an implementation or weights for this product. AlphaEarth embeddings are not integrated as an imagery layer.
+
+## Deployment and verification
+
+[OCI Always Free pilot deployment](deploy/oci/README.md) explains the Arm image, HTTPS setup, source allowlist, backups, quotas, and release blockers. The `docker-compose.yml` file is the pilot deployment. OCI Always Free has no uptime SLA. Google Cloud trial credits are not used.
+
 ```bash
-# Launch the 3D geospatial console at http://localhost:5173
-pnpm --filter gods-eye-view dev
+node --test apps/gateway/test/gateway.test.js
 ```
 
-### 3. Run Monorepo Test Battery
-```bash
-# Runs full test suite across all packages (2,746 tests in gods-eye-view + packages)
-pnpm test
-```
+The older Cesium console remains in `gods-eye-view/` as a research prototype with its own development proxy and provider setup. The creative `apps/studio/` is synthetic. Neither is the hardened pilot gateway. Their screenshots, simulations, model lists, and historical marketing material are not evidence of a live defense deployment.
 
----
+## Data and license notes
 
-## 🎮 Tactical Keyboard Shortcuts
+The pilot serves a [Natural Earth](https://www.naturalearthdata.com/about/terms-of-use/) public-domain outline and [USGS 3DEP](https://www.usgs.gov/faqs/what-are-terms-uselicensing-map-services-and-data-national-map) elevation samples. Attribution and source links travel with observations and exports. [Fintraffic](https://www.digitraffic.fi/en/terms-of-service/) is CC BY 4.0; [GDELT](https://gdeltproject.org/about.html) permits commercial dataset use with citation. News links lead to publishers; Aetheris does not rebroadcast their content. Source code licenses do not grant rights to third-party feeds. Review each new source before enabling it in a commercial or operational setting.
 
-| Key | Tactical Action |
-| :---: | :--- |
-| `1` | **Normal Photoreal View** (Default RGB) |
-| `2` | **CRT Surveillance Mode** (Scanlines & phosphor bloom) |
-| `3` | **Green Phosphor Night Vision** (NVG low-light amplification) |
-| `4` | **FLIR Thermal Vision** (Heat plume & thermal false-color) |
-| `5` | **Edge-Detection Sobel View** (Wireframe infrastructure) |
-| `c` | **Toggle Live CCTV Viewshed Panel** (Instant municipal camera stream) |
-| `v` | **Push-to-Talk Voice Comms** (Tactical VHF radio simulator) |
-| `Space` | **Pause / Resume Camera Orbit** |
-
----
-
-## 🛡️ Strategic Commercial & Sovereign Tiers
-
-| Tier | Deployment Model | Target Cohort | SLA / Capabilities |
-| :--- | :--- | :--- | :--- |
-| **Developer / OSS** | Free / Open-Source | Researchers, GIS Developers | Browser WebGL, public feeds, community support |
-| **Tactical Edge** | $48,000 / year | Commercial Fleets, First Responders | Offline vector caching, drone telemetry ingest, 24/7 SLA |
-| **Enterprise Digital Twin** | Illustrative pricing hypothesis | Power Utilities, Climate Insurers | Candidate annual-embedding analysis after licensed access and validation; custom scene work would require a scoped pilot |
-| **Sovereign SCIF Airgap** | $950,000 / deployment | Defense Primes, Combatant Commands | 100% air-gapped on-premise, AgentShield v2.0, zero cloud egress |
-
----
-
-## 📜 Documentation & Strategic Publications
-
-* [`WHITE_PAPER_AETHERIS_WORLD_ENGINE.md`](WHITE_PAPER_AETHERIS_WORLD_ENGINE.md): Full markdown whitepaper with KaTeX formulas, empirical tables, and diagrams.
-* [**`paper/aetheris_world_engine_whitepaper.pdf`**](paper/aetheris_world_engine_whitepaper.pdf): Compiled 7-page camera-ready PDF (IEEE/CVPR two-column format).
-* [`paper/main.tex`](paper/main.tex) & [`paper/references.bib`](paper/references.bib): Complete LaTeX source and BibTeX database formatted for arXiv (`cs.CV`, `cs.AI`, `cs.GR`).
-* [`O1_AI_BUSINESS_BLUEPRINT.md`](O1_AI_BUSINESS_BLUEPRINT.md): Legal and technical evidentiary matrix for U.S. O-1A / EB-1A extraordinary ability qualification.
-* [`NSF_SBIR_PHASE_I_PROPOSAL.md`](NSF_SBIR_PHASE_I_PROPOSAL.md): $275k National Science Foundation Phase I SBIR proposal for resilient infrastructure.
-* [`GTM_LAUNCH_PLAYBOOK.md`](GTM_LAUNCH_PLAYBOOK.md): Complete 7-part viral social launch thread and PR distribution plan.
-* [`AETHERIS_SWARM_PREDICTION_REPORT_V3.md`](AETHERIS_SWARM_PREDICTION_REPORT_V3.md): MiroFish multi-agent simulation report (Score 97/100).
-
----
-
-## ⚖️ License & Acknowledgements
-
-* **License**: The upstream geospatial base includes an [MIT license](gods-eye-view/LICENSE). Review rights for other modules, datasets, imagery, models, and media separately.
-* **Architecture**: Engineered by **Aryaman Dev** (Aetheris geospatial prototype, synthetic land scenario, multi-agent experiments, scenario cartridges). Google AlphaEarth integration is planned, not implemented.
-* **Upstream Geospatial Base**: Initial CesiumJS foundation by **Bilawal Sidhu** ([God's Eye View](https://github.com/bilawalsidhu/gods-eye-view)).
-* **Candidate data sources**: Google AlphaEarth annual embeddings, Google Maps 3D tiles, OpenSky Network, CelesTrak, NASA FIRMS, AISHub, USGS, and TomTom. Availability and rights are source-specific; a listed provider does not imply an active or licensed feed.
-
-<div align="center">
-  <sub>Aetheris Spatial // Designed for Planetary Defense, Resilience, and Sovereign Intelligence</sub>
-</div>
+See the [readiness review](DEFENSE_STARTUP_READINESS.md), [source feasibility review](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md), and [master product plan](AETHERIS_MASTER_PLAN.md) for known gaps and research paths.

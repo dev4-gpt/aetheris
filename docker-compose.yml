@@ -1,52 +1,38 @@
-version: '3.8'
-
+name: aetheris-pilot
 services:
   gateway:
     build:
       context: .
-      target: gateway
-    ports:
-      - "3001:3001"
+      dockerfile: Dockerfile
+    restart: unless-stopped
     environment:
-      - PORT=3001
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      AETHERIS_ADMIN_PASSWORD: ${AETHERIS_ADMIN_PASSWORD:?Set AETHERIS_ADMIN_PASSWORD in .env}
+      AETHERIS_DB_PATH: /data/aetheris.db
+    volumes:
+      - aetheris_data:/data
+    expose:
+      - "3001"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
-    volumes:
-      - ./apps/gateway:/app/apps/gateway
-
-  console:
-    image: node:22-alpine
-    working_dir: /app
-    volumes:
-      - ./gods-eye-view:/app
-    command: npm run dev -- --port 4173 --host
-    ports:
-      - "4173:4173"
+  caddy:
+    image: caddy:2.9.1-alpine
+    restart: unless-stopped
     environment:
-      - CESIUM_ION_TOKEN=${CESIUM_ION_TOKEN}
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4173"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  agents:
-    build:
-      context: .
-      target: agents
+      AETHERIS_DOMAIN: ${AETHERIS_DOMAIN:?Set AETHERIS_DOMAIN in .env}
     ports:
-      - "8000:8000"
-    environment:
-      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./agents:/app/agents
+      - ./deploy/oci/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      gateway:
+        condition: service_healthy
+volumes:
+  aetheris_data:
+  caddy_data:
+  caddy_config:

@@ -30,6 +30,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Audit pilot production dependencies
+        run: npm audit --prefix apps/gateway --omit=dev --audit-level=moderate
       - name: Run lint
         run: pnpm lint
       - name: Run typecheck
@@ -38,3 +40,14 @@ jobs:
         run: pnpm test
       - name: Build
         run: pnpm build
+
+  pilot-arm-image:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Build OCI pilot image for Arm64
+        run: docker buildx build --platform linux/arm64 --file Dockerfile --output type=oci,dest=/tmp/aetheris-arm64.tar .

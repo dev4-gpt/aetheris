@@ -87,8 +87,9 @@ test('Studio Route: POST /api/generate with 3D Spatial Conditioning', async () =
 
   assert.equal(res.statusCode, 200);
   const data = res.json();
-  assert.equal(data.status, 'completed');
+  assert.equal(data.status, 'synthetic');
   assert.equal(data.modelId, 'wan-2.1-t2v-14b');
+  assert.equal(data.output.url, null);
   assert.equal(data.output.spatialConditioningApplied, true);
   assert.ok(data.output.cameraTrajectorySampleCount > 0);
 });
