@@ -11,7 +11,7 @@
   <a class="skip" href="#main">Skip to workspace</a>
   <header class="topbar">
     <div class="brand"><span class="brand-mark">A</span><div><strong>AETHERIS</strong><small>BASE RESILIENCE PLANNING</small></div></div>
-    <div class="top-meta"><span class="badge">UNCLASSIFIED · PUBLIC DATA PILOT</span><span id="userLabel"></span><button id="logoutBtn" class="quiet" hidden>Sign out</button></div>
+    <div class="top-meta"><span class="badge">UNCLASSIFIED · PUBLIC DATA PILOT</span><div class="theme-switch" role="group" aria-label="Color theme"><button id="darkTheme" type="button" aria-pressed="true">Dark</button><button id="lightTheme" type="button" aria-pressed="false">Light</button></div><span id="userLabel"></span><button id="logoutBtn" class="quiet" hidden>Sign out</button></div>
   </header>
 
   <main id="main">
@@ -42,9 +42,10 @@
         </aside>
 
         <section class="panel map-panel" aria-labelledby="mapTitle">
-          <div class="panel-heading"><div><span class="eyebrow">02 / GLOBAL CONTEXT</span><h2 id="mapTitle">Observation map</h2></div><span class="map-legend"><i></i> Current <i></i> Delayed</span></div>
-          <div class="map-wrap"><canvas id="worldMap" role="img" aria-label="Global map showing selected observations"></canvas><div class="map-stamp">NATURAL EARTH · PUBLIC DOMAIN BASE</div></div>
-          <div class="map-footer"><span id="mapStatus">Waiting for a selected layer</span><span>Choose a marker to inspect provenance</span></div>
+          <div class="panel-heading"><div><span class="eyebrow">02 / GLOBAL CONTEXT</span><h2 id="mapTitle">Observation globe</h2></div><span class="map-legend"><i></i> Current <i></i> Delayed</span></div>
+          <div class="view-controls" role="group" aria-label="World view"><button id="globeView" type="button" aria-pressed="true">Globe</button><button id="flatView" type="button" aria-pressed="false">Flat map</button><button id="resetView" type="button">Reset view</button></div>
+          <div class="map-wrap"><canvas id="worldMap" role="img" aria-label="Rotatable globe showing selected observations"></canvas><div class="map-stamp">NATURAL EARTH · PUBLIC DOMAIN BASE</div></div>
+          <div class="map-footer"><span id="mapStatus">Waiting for a selected layer</span><span id="mapHint">Drag to rotate · scroll to zoom · choose a marker</span></div>
         </section>
 
         <aside class="panel evidence-panel" aria-labelledby="evidenceTitle">

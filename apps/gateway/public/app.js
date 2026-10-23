@@ -1,5 +1,26 @@
+import { projectGlobe, unprojectGlobe, solarPosition, sunlit } from './globeProjection.js';
+
 const $ = id => document.getElementById(id);
-const state = { csrf: null, role: null, layers: [], active: new Set(), feeds: new Map(), selected: new Map(), scene: null, land: [], markers: [], terrainYaw: Math.PI / 4 };
+function preference(key, allowed, fallback) { try { const value = localStorage.getItem(key); return allowed.includes(value) ? value : fallback; } catch { return fallback; } }
+function savePreference(key, value) { try { localStorage.setItem(key, value); } catch {} }
+const state = { csrf: null, role: null, layers: [], active: new Set(), feeds: new Map(), selected: new Map(), scene: null,
+  land: [], globeTexture: null, markers: [], view: preference('aetheris.view', ['globe', 'flat'], 'globe'),
+  theme: preference('aetheris.theme', ['dark', 'light'], 'dark'), globeLongitude: -35, globeLatitude: 25, globeZoom: 1, terrainYaw: Math.PI / 4 };
+
+function applyTheme(theme) {
+  state.theme = theme; document.documentElement.dataset.theme = theme;
+  $('darkTheme').setAttribute('aria-pressed', String(theme === 'dark'));
+  $('lightTheme').setAttribute('aria-pressed', String(theme === 'light'));
+  savePreference('aetheris.theme', theme); buildGlobeTexture(); renderMap();
+}
+$('darkTheme').addEventListener('click', () => applyTheme('dark'));
+$('lightTheme').addEventListener('click', () => applyTheme('light'));
+document.documentElement.dataset.theme = state.theme;
+$('darkTheme').setAttribute('aria-pressed', String(state.theme === 'dark'));
+$('lightTheme').setAttribute('aria-pressed', String(state.theme === 'light'));
+$('globeView').setAttribute('aria-pressed', String(state.view === 'globe'));
+$('flatView').setAttribute('aria-pressed', String(state.view === 'flat'));
+$('mapTitle').textContent = state.view === 'globe' ? 'Observation globe' : 'Observation map';
 
 async function api(url, options = {}) {
   const headers = { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.method && options.method !== 'GET' ? { 'X-CSRF-Token': state.csrf } : {}), ...options.headers };
@@ -22,7 +43,7 @@ async function enter(session) {
   state.layers = layers.layers;
   state.feeds.set('imported', { status: 'static', observations: imported.observations });
   renderLayers(); renderObservations(); renderDecisionList(decisions.decisions);
-  try { const land = await fetch('/world-regions.json').then(r => r.json()); state.land = (land.features || []).filter(feature => feature.featurecla === 'Continent'); renderMap(); } catch { status('mapStatus', 'Land outline unavailable; observation coordinates remain available'); }
+  try { const land = await fetch('/world-regions.json').then(r => r.json()); state.land = (land.features || []).filter(feature => feature.featurecla === 'Continent'); buildGlobeTexture(); renderMap(); } catch { status('mapStatus', 'Land outline unavailable; observation coordinates remain available'); }
 }
 
 function renderLayers() {
@@ -77,6 +98,9 @@ function renderObservations() {
 
 function selectObservation(record) {
   state.selected.set(record.id, record);
+  if (record.geometry && state.view === 'globe') {
+    state.globeLongitude = record.geometry.coordinates[0]; state.globeLatitude = Math.max(-75, Math.min(75, record.geometry.coordinates[1]));
+  }
   const detail = $('evidenceDetail'); detail.replaceChildren();
   detail.append(el('span', record.status.toUpperCase(), `state ${record.status}`), el('h3', record.label));
   const dl = el('dl');
@@ -91,15 +115,89 @@ function selectObservation(record) {
 }
 
 function canvasSize(canvas) { const ratio = Math.min(devicePixelRatio || 1, 2); const rect = canvas.getBoundingClientRect(); canvas.width = Math.round(rect.width * ratio); canvas.height = Math.round(rect.height * ratio); const ctx = canvas.getContext('2d'); ctx.setTransform(ratio, 0, 0, ratio, 0, 0); return { ctx, width: rect.width, height: rect.height }; }
-function renderMap() {
+
+function buildGlobeTexture() {
+  const canvas = document.createElement('canvas'); canvas.width = 1440; canvas.height = 720;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.fillStyle = state.theme === 'light' ? '#bddde8' : '#153044'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (const feature of state.land) for (const polygon of feature.polygons || []) {
+    if (polygon.length < 3) continue;
+    ctx.beginPath();
+    polygon.forEach(([lon, lat], index) => { const x = (lon + 180) / 360 * canvas.width, y = (90 - lat) / 180 * canvas.height;
+      if (index) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
+    ctx.closePath(); ctx.fillStyle = state.theme === 'light' ? '#729d95' : '#45656b'; ctx.fill();
+    ctx.strokeStyle = state.theme === 'light' ? '#3c746f' : '#83aaa9'; ctx.lineWidth = .7; ctx.stroke();
+  }
+  state.globeTexture = ctx.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+function renderMap() { if (state.view === 'globe') renderGlobe(); else renderFlatMap(); }
+
+function renderGlobe() {
+  const canvas = $('worldMap'); if (!canvas || canvas.getBoundingClientRect().width === 0) return;
+  const { ctx, width, height } = canvasSize(canvas), pixelWidth = canvas.width, pixelHeight = canvas.height;
+  const ratio = pixelWidth / width, cx = width / 2, cy = height / 2, radius = Math.min(width, height) * .43 * state.globeZoom;
+  const pixelCx = cx * ratio, pixelCy = cy * ratio, pixelRadius = radius * ratio;
+  const texture = state.globeTexture;
+  const image = ctx.createImageData(pixelWidth, pixelHeight), pixels = image.data;
+  const sun = state.active.has('day-night') ? solarPosition(new Date()) : null;
+  if (texture) {
+    const centerLat = state.globeLatitude * Math.PI / 180, sinCenter = Math.sin(centerLat), cosCenter = Math.cos(centerLat);
+    const startY = Math.max(0, Math.floor(pixelCy - pixelRadius)), endY = Math.min(pixelHeight, Math.ceil(pixelCy + pixelRadius));
+    for (let py = startY; py < endY; py++) {
+      const y = (pixelCy - py) / pixelRadius, halfWidth = Math.sqrt(Math.max(0, 1 - y * y)) * pixelRadius;
+      for (let px = Math.max(0, Math.floor(pixelCx - halfWidth)); px < Math.min(pixelWidth, Math.ceil(pixelCx + halfWidth)); px++) {
+        const x = (px - pixelCx) / pixelRadius, distance = x * x + y * y;
+        if (distance > 1) continue;
+        const depth = Math.sqrt(1 - distance);
+        const lat = Math.asin(depth * sinCenter + y * cosCenter);
+        const lon = state.globeLongitude * Math.PI / 180 + Math.atan2(x, depth * cosCenter - y * sinCenter);
+        const longitude = lon * 180 / Math.PI, latitude = lat * 180 / Math.PI;
+        const u = ((Math.floor((lon / (2 * Math.PI) + .5) * texture.width) % texture.width) + texture.width) % texture.width;
+        const v = Math.max(0, Math.min(texture.height - 1, Math.floor((.5 - lat / Math.PI) * texture.height)));
+        const source = (v * texture.width + u) * 4, target = (py * pixelWidth + px) * 4;
+        let light = state.theme === 'light' ? .72 + .28 * Math.pow(depth, .55) : .45 + .55 * Math.pow(depth, .55);
+        if (sun && sunlit(longitude, latitude, sun) < 0) light *= .38;
+        pixels[target] = texture.data[source] * light;
+        pixels[target + 1] = texture.data[source + 1] * light;
+        pixels[target + 2] = texture.data[source + 2] * light;
+        pixels[target + 3] = 255;
+      }
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  ctx.strokeStyle = state.theme === 'light' ? '#709ca9' : '#5a8999'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.stroke();
+  const graticule = (coordinates) => { ctx.beginPath(); let drawing = false;
+    for (const coordinate of coordinates) { const point = projectGlobe(coordinate, state.globeLongitude, state.globeLatitude);
+      if (point.depth < 0) { drawing = false; continue; }
+      const x = cx + point.x * radius, y = cy - point.y * radius;
+      if (drawing) ctx.lineTo(x, y); else ctx.moveTo(x, y); drawing = true;
+    } ctx.stroke(); };
+  ctx.strokeStyle = state.theme === 'light' ? '#18495948' : '#add8d624'; ctx.lineWidth = .65;
+  for (let lon = -180; lon < 180; lon += 30) graticule(Array.from({ length: 73 }, (_, index) => [lon, -90 + index * 2.5]));
+  for (let lat = -60; lat <= 60; lat += 30) graticule(Array.from({ length: 145 }, (_, index) => [-180 + index * 2.5, lat]));
+  state.markers = [];
+  for (const record of activeObservations()) {
+    if (!record.geometry) continue;
+    const point = projectGlobe(record.geometry.coordinates, state.globeLongitude, state.globeLatitude);
+    if (point.depth < 0) continue;
+    const x = cx + point.x * radius, y = cy - point.y * radius;
+    ctx.beginPath(); ctx.arc(x, y, state.selected.has(record.id) ? 5.5 : 3.2, 0, Math.PI * 2);
+    ctx.fillStyle = record.status === 'live' ? '#86e5d2' : record.status === 'synthetic' ? '#9c8cee' : '#eebd72'; ctx.fill();
+    state.markers.push({ x, y, record });
+  }
+  $('mapHint').textContent = `${state.markers.length} points on visible hemisphere · drag to rotate · scroll to zoom`;
+}
+
+function renderFlatMap() {
   const canvas = $('worldMap'); if (!canvas || canvas.getBoundingClientRect().width === 0) return;
   const { ctx, width, height } = canvasSize(canvas);
   const project = ([lon, lat]) => [(lon + 180) / 360 * width, (90 - lat) / 180 * height];
   ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = '#29465a'; ctx.lineWidth = 1;
+  ctx.strokeStyle = state.theme === 'light' ? '#b2cad3' : '#29465a'; ctx.lineWidth = 1;
   for (let lon = -180; lon <= 180; lon += 30) { const x = project([lon, 0])[0]; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
   for (let lat = -60; lat <= 60; lat += 30) { const y = project([0, lat])[1]; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
-  ctx.fillStyle = '#244a52'; ctx.strokeStyle = '#5d8a88'; ctx.lineWidth = .6;
+  ctx.fillStyle = state.theme === 'light' ? '#8eb5ac' : '#244a52'; ctx.strokeStyle = state.theme === 'light' ? '#4b837d' : '#5d8a88'; ctx.lineWidth = .6;
   for (const feature of state.land) for (const polygon of feature.polygons || []) {
     if (!polygon.length) continue; ctx.beginPath(); polygon.forEach((p, i) => { const [x, y] = project(p); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }); ctx.closePath(); ctx.fill(); ctx.stroke();
   }
@@ -121,6 +219,7 @@ function renderMap() {
     ctx.fillStyle = record.status === 'live' ? '#86e5d2' : record.status === 'synthetic' ? '#9c8cee' : '#eebd72'; ctx.fill();
     state.markers.push({ x, y, record });
   }
+  $('mapHint').textContent = 'Flat map · choose a marker to inspect provenance';
 }
 
 function renderTerrain() {
@@ -178,9 +277,40 @@ $('decisionForm').addEventListener('submit', async event => { event.preventDefau
   try { const result = await api('/api/v1/decisions', { method: 'POST', body: JSON.stringify({ title: form.get('title'), note: form.get('note'), sceneId: state.scene.id, observationIds: [...state.selected.keys()].slice(0, 50) }) });
     status('decisionStatus', `Saved ${result.id}. `); const link = el('a', 'Download JSON'); link.href = `/api/v1/decisions/${result.id}/export`; $('decisionStatus').append(link); await reloadDecisions(); }
   catch (error) { status('decisionStatus', error.message); } });
-$('worldMap').addEventListener('click', event => { const rect = event.currentTarget.getBoundingClientRect(); const x = event.clientX - rect.left, y = event.clientY - rect.top;
+function setWorldView(view) {
+  state.view = view;
+  savePreference('aetheris.view', view);
+  $('globeView').setAttribute('aria-pressed', String(view === 'globe'));
+  $('flatView').setAttribute('aria-pressed', String(view === 'flat'));
+  $('mapTitle').textContent = view === 'globe' ? 'Observation globe' : 'Observation map';
+  $('worldMap').setAttribute('aria-label', view === 'globe' ? 'Rotatable globe showing selected observations' : 'Global map showing selected observations');
+  renderMap();
+}
+$('globeView').addEventListener('click', () => setWorldView('globe'));
+$('flatView').addEventListener('click', () => setWorldView('flat'));
+$('resetView').addEventListener('click', () => { state.globeLongitude = -35; state.globeLatitude = 25; state.globeZoom = 1; setWorldView('globe'); });
+let mapDrag = null, mapMoved = false, mapFrame = null;
+function queueMapRender() { if (mapFrame !== null) return; mapFrame = requestAnimationFrame(() => { mapFrame = null; renderMap(); }); }
+$('worldMap').addEventListener('pointerdown', event => { if (state.view !== 'globe') return;
+  mapDrag = { x: event.clientX, y: event.clientY }; mapMoved = false; event.currentTarget.setPointerCapture(event.pointerId); });
+$('worldMap').addEventListener('pointermove', event => { if (!mapDrag || state.view !== 'globe') return;
+  const dx = event.clientX - mapDrag.x, dy = event.clientY - mapDrag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 1) mapMoved = true;
+  state.globeLongitude = ((state.globeLongitude - dx * .45 + 180) % 360 + 360) % 360 - 180;
+  state.globeLatitude = Math.max(-85, Math.min(85, state.globeLatitude + dy * .45));
+  mapDrag = { x: event.clientX, y: event.clientY }; queueMapRender(); });
+$('worldMap').addEventListener('pointerup', () => { mapDrag = null; });
+$('worldMap').addEventListener('pointercancel', () => { mapDrag = null; });
+$('worldMap').addEventListener('wheel', event => { if (state.view !== 'globe') return;
+  event.preventDefault(); state.globeZoom = Math.max(.68, Math.min(1.15, state.globeZoom - Math.sign(event.deltaY) * .08)); queueMapRender(); }, { passive: false });
+$('worldMap').addEventListener('click', event => { if (mapMoved) { mapMoved = false; return; }
+  const rect = event.currentTarget.getBoundingClientRect(); const x = event.clientX - rect.left, y = event.clientY - rect.top;
   const nearest = state.markers.reduce((best, item) => { const d = Math.hypot(item.x - x, item.y - y); return d < best.distance ? { item, distance: d } : best; }, { item: null, distance: 12 });
-  if (nearest.item) selectObservation(nearest.item.record); });
+  if (nearest.item) selectObservation(nearest.item.record);
+  else if (state.view === 'globe') { const radius = Math.min(rect.width, rect.height) * .43 * state.globeZoom;
+    const location = unprojectGlobe((x - rect.width / 2) / radius, (rect.height / 2 - y) / radius, state.globeLongitude, state.globeLatitude);
+    if (location) { state.globeLongitude = location[0]; state.globeLatitude = Math.max(-85, Math.min(85, location[1])); renderMap(); }
+  } });
 window.addEventListener('resize', () => { renderMap(); renderTerrain(); });
 let terrainDrag = null;
 $('terrainCanvas').addEventListener('pointerdown', event => { terrainDrag = event.clientX; event.currentTarget.setPointerCapture(event.pointerId); });

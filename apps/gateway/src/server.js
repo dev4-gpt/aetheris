@@ -12,7 +12,7 @@ import { createStore } from './store.js';
 
 const PUBLIC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../public');
 const WORLD_REGIONS = path.resolve(PUBLIC, '../../../gods-eye-view/src/data/local_data/natural_earth/regions.json');
-const STATIC = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/styles.css': ['styles.css', 'text/css'] };
+const STATIC = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/globeProjection.js': ['globeProjection.js', 'text/javascript'], '/styles.css': ['styles.css', 'text/css'] };
 const writes = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const cookieToken = request => /(?:^|;\s*)aetheris_session=([^;]+)/.exec(request.headers.cookie || '')?.[1] || null;
 

@@ -7,6 +7,7 @@ import { buildServer } from '../src/server.js';
 import { createFeedService } from '../src/feeds.js';
 import { createStore } from '../src/store.js';
 import { publicImport } from '../src/observations.js';
+import { projectGlobe, unprojectGlobe, solarPosition, sunlit } from '../public/globeProjection.js';
 
 const ADMIN_PASSWORD = 'test-admin-password-very-long';
 const now = () => new Date().toISOString();
@@ -41,6 +42,12 @@ describe('pilot gateway', () => {
     assert.equal(result.statusCode, 200);
     assert.equal(result.headers['access-control-allow-origin'], undefined);
     assert.ok(result.json().layers.some(layer => layer.id === 'flights'));
+    const page = await app.inject('/');
+    assert.equal(page.statusCode, 200);
+    assert.match(page.body, /id="globeView"/);
+    assert.match(page.body, /id="flatView"/);
+    assert.match(page.body, /id="lightTheme"/);
+    assert.equal((await app.inject('/globeProjection.js')).statusCode, 200);
   });
 
   test('real adapters preserve source, time, rights, and coverage', async () => {
@@ -112,6 +119,19 @@ test('feed body without Content-Length is bounded before parsing', async () => {
   const result = await service.get('earthquakes');
   assert.equal(result.status, 'unavailable');
   assert.match(result.error, /too large/);
+});
+
+test('globe projection keeps observations on the correct hemisphere', () => {
+  const center = projectGlobe([-77, 39], -77, 39);
+  assert.ok(Math.abs(center.x) < 1e-12 && Math.abs(center.y) < 1e-12);
+  assert.ok(center.depth > .999);
+  assert.ok(projectGlobe([103, -39], -77, 39).depth < 0);
+  const coordinate = unprojectGlobe(center.x, center.y, -77, 39);
+  assert.ok(Math.abs(coordinate[0] + 77) < 1e-10 && Math.abs(coordinate[1] - 39) < 1e-10);
+  assert.equal(unprojectGlobe(1.01, 0, 0, 0), null);
+  const sun = solarPosition(new Date('2026-03-20T12:00:00Z'));
+  assert.ok(sunlit(sun.longitude, sun.latitude, sun) > .99);
+  assert.ok(sunlit(sun.longitude + 180, -sun.latitude, sun) < -.99);
 });
 
 test('outage and rate limit never become fake live data; stale cache is labeled delayed', async () => {

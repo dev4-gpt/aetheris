@@ -1,6 +1,6 @@
 # Aetheris
 
-Aetheris is an unclassified base resilience planning prototype. The new pilot workspace reviews public or operator-imported observations, shows source and freshness, builds a bounded U.S. terrain scene from USGS elevation samples, and saves replayable decision records. It is designed for human review; it does not authenticate user-imported claims, provide a surveyed terrain model, or make operational decisions.
+Aetheris is an unclassified base resilience planning prototype. The new pilot workspace reviews public or operator-imported observations on a rotatable globe or flat map, shows source and freshness, builds a bounded U.S. terrain scene from USGS elevation samples, and saves replayable decision records. Both world views and the light/dark theme can be switched in the workspace. It is designed for human review; it does not authenticate user-imported claims, provide a surveyed terrain model, or make operational decisions.
 
 ## Pilot workspace
 
