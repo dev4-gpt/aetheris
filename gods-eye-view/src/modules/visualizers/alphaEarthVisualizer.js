@@ -1,7 +1,6 @@
 /**
- * DeepMind AlphaEarth 3D Visualizer
- * Renders 10x10m foundation model ground truth grid cells, SAR penetration vectors,
- * and holographic environmental risk scorecards in Cesium.
+ * Synthetic land-scenario visualizer. The nominal cells and scores are
+ * generated locally; no AlphaEarth raster or SAR observation is loaded.
  * 
  * @module alphaEarthVisualizer
  */
@@ -21,7 +20,7 @@ export function createAlphaEarthVisualizer(viewer, Cesium) {
       type: 'FLOOD_HAZARD',
       color: Cesium.Color.CYAN.withAlpha(0.55),
       outlineColor: Cesium.Color.DEEPSKYBLUE,
-      status: 'HIGH FLOOD RISK (82%) · ALLUVIAL SOIL'
+      status: 'SYNTHETIC FLOOD SCENARIO · NOT MEASURED'
     },
     {
       name: 'California Central Valley Farmland (Fresno Ag Sector)',
@@ -30,7 +29,7 @@ export function createAlphaEarthVisualizer(viewer, Cesium) {
       type: 'AG_CROP_STRESS',
       color: Cesium.Color.LIMEGREEN.withAlpha(0.5),
       outlineColor: Cesium.Color.LIME,
-      status: 'SAR CLOUD-PENETRATING: EARLY DROUGHT STRESS (+14mm REQ)'
+      status: 'SYNTHETIC CROP SCENARIO · NO SAR DATA'
     },
     {
       name: 'Amazon Tapajós Basin (Unmapped Frontier)',
@@ -39,7 +38,7 @@ export function createAlphaEarthVisualizer(viewer, Cesium) {
       type: 'CANOPY_BREACH',
       color: Cesium.Color.ORANGE.withAlpha(0.6),
       outlineColor: Cesium.Color.RED,
-      status: 'SUB-CANOPY TIMBER BREACH DETECTED UNDER 95% CLOUD'
+      status: 'SYNTHETIC CANOPY SCENARIO · NO DETECTION'
     },
     {
       name: 'Antarctica Pine Island Glacier Tongue',
@@ -48,7 +47,7 @@ export function createAlphaEarthVisualizer(viewer, Cesium) {
       type: 'ICE_RIFT',
       color: Cesium.Color.LIGHTSKYBLUE.withAlpha(0.6),
       outlineColor: Cesium.Color.WHITE,
-      status: 'SUB-SURFACE 10m BASAL ICE RIFT FRACTURE DETECTED'
+      status: 'SYNTHETIC ICE SCENARIO · NO DETECTION'
     }
   ];
 
@@ -90,7 +89,7 @@ export function createAlphaEarthVisualizer(viewer, Cesium) {
       const labelEntity = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(sector.lon, sector.lat, 80),
         label: {
-          text: `🌱 ALPHAEARTH FOUNDATION [10x10m]\n${sector.name.toUpperCase()}\n${sector.status}\nGRADE: ${score.compositeGrade} · FLOOD: ${score.floodRiskScore}% · FIRE: ${score.wildfireRiskScore}% · SOIL: ${score.soilHealthIndex}/100`,
+          text: `SYNTHETIC LAND DEMO · NO ALPHAEARTH DATA\n${sector.name.toUpperCase()}\n${sector.status}\nILLUSTRATIVE INDEX: ${score.compositeGrade} · FLOOD: ${score.floodRiskScore} · FIRE: ${score.wildfireRiskScore} · SOIL: ${score.soilHealthIndex}`,
           font: 'bold 11pt ui-monospace, SFMono-Regular, Menlo, monospace',
           fillColor: Cesium.Color.WHITE,
           backgroundColor: Cesium.Color.fromCssColorString('rgba(10, 25, 40, 0.88)'),
@@ -142,7 +141,7 @@ export function createAlphaEarthVisualizer(viewer, Cesium) {
 
       // 10x10m high-resolution cell
       const cellEntity = viewer.entities.add({
-        name: `AlphaEarth 10x10m Cell (${bbox.gridId})`,
+        name: `Synthetic nominal 10m cell (${bbox.gridId})`,
         rectangle: {
           coordinates: Cesium.Rectangle.fromDegrees(bbox.west, bbox.south, bbox.east, bbox.north),
           material: Cesium.Color.SPRINGGREEN.withAlpha(0.55),
@@ -158,7 +157,7 @@ export function createAlphaEarthVisualizer(viewer, Cesium) {
       const cardEntity = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(bbox.centerLon, bbox.centerLat, 45),
         label: {
-          text: `🌱 ALPHAEARTH FOUNDATION CELL [10x10m]\nGRID: ${bbox.gridId}\nGRADE: ${score.compositeGrade} · FLOOD RISK: ${score.floodRiskScore}%\nWILDFIRE: ${score.wildfireRiskScore}% · SOIL HEALTH: ${score.soilHealthIndex}/100\n${score.valuationAdvisory}`,
+          text: `SYNTHETIC LAND DEMO · NO ALPHAEARTH DATA\nGRID: ${bbox.gridId}\nILLUSTRATIVE INDEX: ${score.compositeGrade} · FLOOD: ${score.floodRiskScore}\nFIRE: ${score.wildfireRiskScore} · SOIL: ${score.soilHealthIndex}\n${score.valuationAdvisory}`,
           font: 'bold 11pt ui-monospace, SFMono-Regular, Menlo, monospace',
           fillColor: Cesium.Color.fromCssColorString('#a7f3d0'),
           backgroundColor: Cesium.Color.fromCssColorString('rgba(6, 30, 20, 0.92)'),

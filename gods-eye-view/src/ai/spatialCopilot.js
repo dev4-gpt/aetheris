@@ -150,7 +150,7 @@ export class SpatialCopilot {
       return { type: 'SITREP', query };
     }
 
-    // 3b. DeepMind AlphaEarth 10x10m Foundation Model Queries
+    // 3b. Legacy AlphaEarth commands route to a clearly labeled synthetic demo.
     if (lower.startsWith('score land') || lower.includes('alpha earth') || lower.includes('alphaearth') || lower.includes('crop stress') || lower.includes('unmapped biome') || lower.includes('unmapped frontier') || lower.includes('soil health')) {
       let mode = 'land_score';
       if (lower.includes('crop') || lower.includes('farmer') || lower.includes('ag stress') || lower.includes('drought')) mode = 'crop_stress';
@@ -468,7 +468,7 @@ export class SpatialCopilot {
           }
         }
 
-        // Switch to AlphaEarth cartridge if registered
+        // Switch to the synthetic land cartridge if registered.
         try {
           if (window.__aetherisCartridges && typeof window.__aetherisCartridges.activate === 'function') {
             window.__aetherisCartridges.activate('alpha-earth');
@@ -485,15 +485,12 @@ export class SpatialCopilot {
             action: 'ALPHAEARTH_CROP_STRESS',
             targetName,
             data: stress,
-            speech: `AlphaEarth Sentinel-1 SAR analysis complete. Root-zone moisture index ${stress.rootZoneMoistureIndex} percent.`,
-            message: `[🌱 GOOGLE DEEPMIND ALPHAEARTH // AG STRESS REPORT]\n` +
+            speech: 'Synthetic crop scenario only. No AlphaEarth or SAR data was loaded.',
+            message: `[🌱 ALPHAEARTH-STYLE SYNTHETIC DEMO // NO SATELLITE DATA]\n` +
               `• Target Sector: ${targetName} (${stress.gridId})\n` +
-              `• Cloud Penetration: 100% Sentinel-1 SAR Radar (All-Weather)\n` +
-              `• Root-Zone Moisture Index (RZMI): ${stress.rootZoneMoistureIndex}%\n` +
-              `• SAR Polarization Ratio: ${stress.sarPolarizationDb} dB\n` +
-              `• Optical Lead Advantage: ${stress.opticalLeadDays} days ahead of visible NDVI wilt\n` +
-              `• Stress Severity: ${stress.stressLevel}\n` +
-              `• Advisory: ${stress.advisory}`
+              `• Illustrative moisture index: ${stress.rootZoneMoistureIndex}\n` +
+              `• Scenario state: ${stress.stressLevel}\n` +
+              `• Evidence: none; ${stress.advisory}`
           };
         } else if (intent.mode === 'unmapped_frontier') {
           const frontier = detectUnmappedFrontierAnomaly(targetLat, targetLon, targetName);
@@ -502,13 +499,11 @@ export class SpatialCopilot {
             action: 'ALPHAEARTH_UNMAPPED_FRONTIER',
             targetName,
             data: frontier,
-            speech: `AlphaEarth unmapped frontier analysis complete. Event type: ${frontier.eventType}.`,
-            message: `[🌱 GOOGLE DEEPMIND ALPHAEARTH // UNMAPPED FRONTIER]\n` +
+            speech: 'Synthetic frontier scenario only. No satellite change detection was run.',
+            message: `[🌱 ALPHAEARTH-STYLE SYNTHETIC DEMO // NO DETECTION]\n` +
               `• Monitored Sector: ${targetName} (${frontier.gridId})\n` +
-              `• Event Classification: ${frontier.classification}\n` +
-              `• Latent Cosine Similarity: ${frontier.latentCosineDistance}\n` +
-              `• Sub-Canopy Ground Truth: ${frontier.details}\n` +
-              `• Sensor Mode: 64-D Multimodal Latent Space Foundation Model`
+              `• Hypothetical state: ${frontier.classification}\n` +
+              `• Evidence: none; ${frontier.details}`
           };
         } else {
           const score = scoreLandParcel(targetLat, targetLon, targetName);
@@ -517,16 +512,15 @@ export class SpatialCopilot {
             action: 'ALPHAEARTH_LAND_SCORE',
             targetName,
             data: score,
-            speech: `AlphaEarth 10-meter land score for ${targetName}: Grade ${score.compositeGrade}. Flood risk ${score.floodRiskScore} percent, Wildfire risk ${score.wildfireRiskScore} percent.`,
-            message: `[🌱 GOOGLE DEEPMIND ALPHAEARTH // 10x10m LAND DUE DILIGENCE]\n` +
+            speech: `Synthetic land demo for ${targetName}. No AlphaEarth data or measured risk is available.`,
+            message: `[🌱 ALPHAEARTH-STYLE SYNTHETIC DEMO // NO MEASURED RISK]\n` +
               `• Target Parcel: ${targetName} (${score.gridId})\n` +
-              `• Composite Investment Grade: ${score.compositeGrade}\n` +
-              `• Flood Liability Risk: ${score.floodRiskScore}%\n` +
-              `• Wildfire Susceptibility: ${score.wildfireRiskScore}%\n` +
-              `• Soil Health Index: ${score.soilHealthIndex} / 100\n` +
-              `• 64-D Latent Signature: [${score.embeddingSample.slice(0, 4).join(', ')}...]\n` +
-              `• Valuation Advisory: ${score.valuationAdvisory}\n` +
-              `• Ground Truth Resolution: 10x10m Planetary Mesh`
+              `• Illustrative grade: ${score.compositeGrade}\n` +
+              `• Illustrative flood index: ${score.floodRiskScore}\n` +
+              `• Illustrative wildfire index: ${score.wildfireRiskScore}\n` +
+              `• Illustrative soil index: ${score.soilHealthIndex}\n` +
+              `• Evidence: none; ${score.valuationAdvisory}\n` +
+              `• Resolution: nominal display cell, not a sampled raster`
           };
         }
       }

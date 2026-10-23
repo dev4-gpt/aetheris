@@ -1,13 +1,7 @@
 /**
- * DeepMind AlphaEarth Foundations Cartridge
- * 
- * Implements the 10x10 meter multimodal planetary intelligence model:
- * - Pre-acquisition land risk scoring (flood, wildfire, soil health, composite grade)
- * - Cloud-penetrating agricultural crop stress & root-zone moisture (weeks ahead of optical)
- * - Unmapped frontier monitoring (Amazon canopy breach under cloud cover, Antarctic ice rifts)
- * 
- * Powered by 64-dimensional multimodal geospatial latent embeddings
- * (Sentinel-1 SAR, Sentinel-2 Optical, Copernicus DEM, Climate Reanalysis).
+ * Synthetic land-scenario cartridge. This does not load or run Google's
+ * AlphaEarth Foundations model or Satellite Embedding dataset. All vectors,
+ * scores, events, and advisories below are deterministic fixtures.
  * 
  * @module alphaEarthCartridge
  */
@@ -15,7 +9,8 @@
 import { CARTRIDGE_IDS } from './cartridgeRegistry.js';
 
 /**
- * Approximate 10m cell delta in degrees
+ * Approximate nominal 10m cell delta in degrees, not the alignment of
+ * Google's UTM-projected embedding rasters.
  * 1 degree latitude ~ 111,320m -> 10m ~ 0.00008983 deg
  */
 export function get10mBoundingBox(lat, lon) {
@@ -41,7 +36,7 @@ export function get10mBoundingBox(lat, lon) {
 
 /**
  * Deterministic pseudo-random generator seeded by coordinates
- * Generates reproducible 64-dimensional latent embedding vector
+ * Generates a reproducible synthetic 64-value vector. It is not an embedding.
  */
 export function generate64DEmbedding(lat, lon) {
   const seed = Math.sin(lat * 12.9898 + lon * 78.233) * 43758.5453;
@@ -55,54 +50,52 @@ export function generate64DEmbedding(lat, lon) {
 }
 
 /**
- * Capability 1: Pre-Acquisition Land Risk Due Diligence Scoring
- * Evaluates flood risk, wildfire susceptibility, soil health, and composite rating
- * for any 10x10 meter square on Earth.
+ * Illustrative land scores for UI testing. Values are not measured risks.
  */
 export function scoreLandParcel(lat, lon, label = 'Target Land Parcel') {
   const bbox = get10mBoundingBox(lat, lon);
   const embedding = generate64DEmbedding(lat, lon);
 
-  // Compute environmental parameters from latent coordinates & embedding components
+  // Compute arbitrary example inputs from the synthetic vector.
   const absLat = Math.abs(lat);
   const elevationFactor = Math.abs(embedding[0]);
   const slopeHydrology = Math.abs(embedding[1]);
   const vegetationBiomass = (embedding[2] + 1.0) / 2.0; // [0, 1]
-  const sarBackscatter = embedding[3]; // -1 to +1
+  const sarBackscatter = embedding[3]; // arbitrary fixture component, not SAR
 
-  // 1. Flood Risk (0-100%): driven by low elevation, high slope hydrology accumulation, SAR water saturation
+  // Illustrative index; these components are not measured physical variables.
   let floodRisk = Math.min(99, Math.max(1, Math.round((1.0 - elevationFactor * 0.6 + slopeHydrology * 0.4) * 55 + (sarBackscatter > 0.4 ? 25 : 0))));
   if (absLat < 10) floodRisk = Math.min(99, floodRisk + 12); // Tropical convergence
 
-  // 2. Wildfire Susceptibility (0-100%): driven by biomass dryness, temperature, slope aspect
+  // Illustrative wildfire index, not a probability or susceptibility model.
   let wildfireRisk = Math.min(99, Math.max(1, Math.round((vegetationBiomass * 0.6 + Math.abs(embedding[4]) * 0.4) * 65)));
   if (absLat > 60) wildfireRisk = Math.max(2, Math.round(wildfireRisk * 0.3)); // Arctic suppression
 
-  // 3. Soil Health Index (0-100): organic carbon proxy, microbial activity, moisture retention
+  // Illustrative soil index, not a measured health proxy.
   const soilHealth = Math.min(100, Math.max(5, Math.round((Math.abs(embedding[5]) * 0.5 + Math.abs(embedding[6]) * 0.5) * 85 + 15)));
 
-  // Composite Investment Grade
+  // Synthetic grade for UI layout; no investment recommendation.
   const compositeScore = 100 - (floodRisk * 0.45 + wildfireRisk * 0.35 - (soilHealth - 50) * 0.2);
   let grade = 'B';
-  let valuationAdvisory = 'Average climate risk profile. Standard insurance and foundation engineering recommended.';
+  let valuationAdvisory = 'Synthetic example only; obtain measured hazard data before any decision.';
   if (compositeScore >= 85) {
     grade = 'AAA';
-    valuationAdvisory = 'Prime tier parcel. Minimal flood & wildfire liability with exceptional topsoil resilience.';
+    valuationAdvisory = 'Synthetic grade only; no parcel suitability conclusion.';
   } else if (compositeScore >= 75) {
     grade = 'AA';
-    valuationAdvisory = 'Superior parcel. Low structural hazards and strong ecological stability.';
+    valuationAdvisory = 'Synthetic grade only; no parcel suitability conclusion.';
   } else if (compositeScore >= 65) {
     grade = 'A';
-    valuationAdvisory = 'Investment grade. Favorable hydrology with moderate seasonal brushfire vigilance.';
+    valuationAdvisory = 'Synthetic grade only; no parcel suitability conclusion.';
   } else if (compositeScore >= 50) {
     grade = 'BBB';
-    valuationAdvisory = 'Moderate environmental exposure. Engineered drainage or defensible brush buffer required.';
+    valuationAdvisory = 'Synthetic grade only; verify hazards with authoritative sources.';
   } else if (compositeScore >= 35) {
     grade = 'BB';
-    valuationAdvisory = 'Elevated hazard sector. Flood plain proximity or steep fuel load risk.';
+    valuationAdvisory = 'Synthetic grade only; verify hazards with authoritative sources.';
   } else {
     grade = 'D';
-    valuationAdvisory = 'Severe environmental liability. 100-year flood zone or extreme wildfire interface.';
+    valuationAdvisory = 'Synthetic grade only; verify hazards with authoritative sources.';
   }
 
   return {
@@ -116,39 +109,39 @@ export function scoreLandParcel(lat, lon, label = 'Target Land Parcel') {
     compositeGrade: grade,
     valuationAdvisory,
     embeddingSample: Array.from(embedding.slice(0, 8)).map(n => Math.round(n * 1000) / 1000),
-    dataResolution: '10x10m Multimodal Ground Truth',
-    source: 'Google DeepMind AlphaEarth Foundations'
+    dataResolution: 'Approximate 10m display cell; no raster sampled',
+    source: 'Aetheris coordinate-seeded synthetic fixture',
+    synthetic: true,
+    modelUsed: false
   };
 }
 
 /**
- * Capability 2: Cloud-Penetrating Agricultural Crop Stress
- * Uses Sentinel-1 SAR VV/VH polarization to detect root-zone moisture loss through clouds
- * weeks before visible optical foliage discoloration.
+ * Illustrative crop stress fields for UI testing. No SAR observation is read.
  */
 export function analyzeAgCropStress(lat, lon, cropType = 'Corn / Soybeans') {
   const bbox = get10mBoundingBox(lat, lon);
   const embedding = generate64DEmbedding(lat, lon);
 
-  // Sentinel-1 SAR VV/VH ratio (dB) penetrates cloud cover
+  // Synthetic number; not a Sentinel-1 measurement.
   const sarVvVhRatioDb = Math.round((-14.2 + embedding[7] * 4.5) * 10) / 10;
-  // Root-Zone Moisture Index (RZMI, 0-100%)
+  // Synthetic root-zone moisture index, not an observation.
   const rzmi = Math.min(100, Math.max(5, Math.round(55 + embedding[8] * 40)));
-  // Optical delay advantage (days SAR catches stress before optical NDVI wilt)
+  // Synthetic number; not a measured lead time.
   const opticalLeadDays = Math.round(14 + Math.abs(embedding[9]) * 10); // 14 to 24 days early!
 
   let stressLevel = 'NOMINAL';
   let irrigationDeltaMm = 0;
-  let advisory = 'Canopy hydration optimal. Soil profile holds adequate moisture.';
+  let advisory = 'Synthetic crop scenario; no moisture measurement or irrigation guidance.';
 
   if (rzmi < 30) {
     stressLevel = 'CRITICAL_DROUGHT';
     irrigationDeltaMm = 28;
-    advisory = `CRITICAL: Sub-surface moisture depleted under cloud deck. Immediate +${irrigationDeltaMm}mm irrigation required. Optical sensors still show green foliage (${opticalLeadDays} days lag).`;
+    advisory = 'Synthetic crop scenario; confirm moisture with authorized observations before acting.';
   } else if (rzmi < 50) {
     stressLevel = 'MODERATE_STRESS';
     irrigationDeltaMm = 14;
-    advisory = `WARNING: Early root-zone moisture draw down detected via SAR. Increase irrigation cycle by +${irrigationDeltaMm}mm ahead of heat front.`;
+    advisory = 'Synthetic crop scenario; confirm moisture with authorized observations before acting.';
   }
 
   return {
@@ -159,17 +152,19 @@ export function analyzeAgCropStress(lat, lon, cropType = 'Corn / Soybeans') {
     rootZoneMoistureIndex: rzmi,
     sarPolarizationDb: sarVvVhRatioDb,
     opticalLeadDays,
-    cloudPenetration: '100% All-Weather Radar Penetration',
+    cloudPenetration: 'Not measured; no radar data loaded',
     stressLevel,
     irrigationDeltaMm,
     advisory,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    source: 'Aetheris coordinate-seeded synthetic fixture',
+    synthetic: true,
+    modelUsed: false
   };
 }
 
 /**
- * Capability 3: Map the Unmapped Frontier (Amazon Canopy Breach & Antarctic Ice Rifts)
- * Monitors planetary frontiers hidden under persistent cloud cover or polar darkness.
+ * Hypothetical frontier events for UI testing. No change detection is run.
  */
 export function detectUnmappedFrontierAnomaly(lat, lon, biome = 'Amazon Rainforest') {
   const bbox = get10mBoundingBox(lat, lon);
@@ -180,22 +175,22 @@ export function detectUnmappedFrontierAnomaly(lat, lon, biome = 'Amazon Rainfore
   const latentCosineDistance = Math.round((1.0 - anomalyScore) * 1000) / 1000;
 
   let eventType = 'STABLE_CANOPY';
-  let classification = 'Intact Primary Biome';
-  let details = 'No structural anomaly detected in 10x10m square. Native latent equilibrium verified.';
+  let classification = 'Synthetic stable scenario';
+  let details = 'Generated fixture; no satellite or ground observation was checked.';
 
   if (lat < 10 && lat > -20 && lon < -45 && lon > -75) {
     // Amazon Basin
     if (isCanopyBreach) {
       eventType = 'ILLEGAL_LOGGING_ROAD';
-      classification = 'Sub-canopy logging road / selective timber extraction';
-      details = 'Sentinel-1 SAR surface roughness shift indicates newly cut 8m corridor under dense 95% cloud cover. Zero optical detection.';
+      classification = 'Hypothetical canopy breach';
+      details = 'Generated fixture; no logging road or SAR change was detected.';
     }
   } else if (lat < -60) {
     // Antarctica
     if (isCanopyBreach) {
       eventType = 'SUB_SURFACE_ICE_RIFT';
-      classification = 'Basal melt fracture propagation';
-      details = 'SAR phase decorrelation detects 10m ice-shelf crevasse propagating at depth beneath firn pack.';
+      classification = 'Hypothetical ice rift';
+      details = 'Generated fixture; no ice rift or SAR change was detected.';
     }
   }
 
@@ -208,7 +203,10 @@ export function detectUnmappedFrontierAnomaly(lat, lon, biome = 'Amazon Rainfore
     classification,
     latentCosineDistance,
     details,
-    unmappedStatus: 'VERIFIED_10M_EMBEDDING'
+    unmappedStatus: 'SYNTHETIC_FIXTURE',
+    source: 'Aetheris coordinate-seeded synthetic fixture',
+    synthetic: true,
+    modelUsed: false
   };
 }
 
@@ -220,9 +218,9 @@ export function createAlphaEarthCartridge(options = {}) {
 
   return {
     id: CARTRIDGE_IDS.ALPHA_EARTH,
-    title: 'AlphaEarth: 10m Multimodal Planetary Intelligence',
-    category: 'DeepMind Planetary Foundation Model & Land Intelligence',
-    description: 'Compresses Earth into 10x10m multimodal embeddings (Sentinel-1 SAR, Sentinel-2 optical, DEM, climate). Delivers pre-acquisition land risk scoring, cloud-penetrating agricultural drought anomaly detection, and unmapped frontier biome monitoring.',
+    title: 'Synthetic land scenario (AlphaEarth integration planned)',
+    category: 'Illustrative land scenario',
+    description: 'Coordinate-seeded demo values only. No Google AlphaEarth embeddings, satellite observations, measured risks, or live model inference are loaded.',
 
     onActivate(context) {
       if (context.visualizer && typeof context.visualizer.show === 'function') {
@@ -248,7 +246,7 @@ export function createAlphaEarthCartridge(options = {}) {
         if (score.floodRiskScore >= 75 || score.wildfireRiskScore >= 75) {
           const alert = {
             id: `alphaearth-risk-${score.gridId}`,
-            level: score.floodRiskScore >= 85 || score.wildfireRiskScore >= 85 ? 'CRITICAL_HAZARD' : 'HIGH_RISK',
+            level: 'SYNTHETIC_SCENARIO',
             parcelLabel: score.label,
             gridId: score.gridId,
             floodRisk: score.floodRiskScore,
@@ -256,7 +254,9 @@ export function createAlphaEarthCartridge(options = {}) {
             soilHealth: score.soilHealthIndex,
             compositeGrade: score.compositeGrade,
             advisory: score.valuationAdvisory,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            synthetic: true,
+            modelUsed: false
           };
           results.push(alert);
           activeAlerts.set(alert.id, alert);

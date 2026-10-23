@@ -4,13 +4,13 @@
 
 # 🌐 AETHERIS SPATIAL
 ### Sovereign Planetary Intelligence & Generative 3D World Engine
-**Fusing 14 Real-Time Telemetry Streams, Google Photorealistic 3D Tiles, and Google DeepMind AlphaEarth 10m Planetary Intelligence**
+**3D geospatial research prototype with labeled synthetic scenarios and a path to permissioned observations**
 
 [![Live Demo](https://img.shields.io/badge/Live_Production-aetheris--spatial.vercel.app-00f0ff?style=for-the-badge&logo=vercel)](https://aetheris-spatial.vercel.app)
 [![Node Test Suite](https://img.shields.io/badge/Tests-Run%20Locally-10b981?style=for-the-badge&logo=node.js)](https://github.com/dev4-gpt/delightful-hawk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-38bdf8?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Engine: CesiumJS](https://img.shields.io/badge/Engine-CesiumJS%201.124-f59e0b?style=for-the-badge)](https://cesium.com)
-[![Foundation Model](https://img.shields.io/badge/AI-DeepMind%20AlphaEarth-8b5cf6?style=for-the-badge)](https://deepmind.google)
+[![Land Scenario](https://img.shields.io/badge/Land_Scenario-Synthetic_Demo-8b5cf6?style=for-the-badge)](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md)
 
 ---
 
@@ -30,6 +30,8 @@ The [related repositories review](RELATED_REPOS_REVIEW.md) ranks reusable ideas 
 
 The [master product and repository plan](AETHERIS_MASTER_PLAN.md) maps the current modules, all 57 public owned repositories, a wider GitHub search of geospatial and 3D tooling, concrete integration points, and the proof gates for a first customer pilot. The account's starred list remains pending because the available GitHub integration does not expose it.
 
+The [AlphaEarth, OSIRIS, and WorldClaw review](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md) checks current access and reuse terms, identifies the synthetic AlphaEarth placeholder in this repo, and gives concrete trials for real annual embeddings, permitted feed adapters, and a separate 3D scenario workspace.
+
 ---
 
 ## 🌍 Overview: The World is Not a Flat 2D Map
@@ -39,7 +41,7 @@ Modern defense commands, aerospace operations, and critical infrastructure opera
 **Aetheris Spatial** solves this with an open-source, sovereign, browser-native **3D WGS84 Planetary Digital Twin** running at 60 fps in WebGL:
 
 * **14 Ingested Telemetry Streams**: OpenSky civilian flights, military combat vectors, CelesTrak NORAD satellite orbits, NASA FIRMS active thermal fires, AIS maritime vessels, USGS earthquakes, and TomTom traffic heatmaps.
-* **DeepMind AlphaEarth 10×10m Ground Truth**: Ingests Google DeepMind's planetary foundation model to compute instant environmental risk scorecards (flood, wildfire, soil health, crop anomalies) for any parcel of land on Earth.
+* **Synthetic land scenario**: Generates coordinate-seeded example cells and illustrative scores for interface testing. It does not ingest Google AlphaEarth embeddings or measure parcel hazards. A real annual-embedding trial is described in the [source review](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md).
 * **Antigravity Autonomous Subagent Swarm**: Hierarchical multi-agent mesh (Orbital, Subsea, Grid, and Red-Team Audit) dispatches parallel tactical reconnaissance via single-stroke `/patrol`, `/defcon`, and `/audit` slash commands.
 * **High-Fidelity 3D PBR Urban Architecture**: Crystal-clear Google Photorealistic 3D Tiles streaming centimeter-level photogrammetry across Austin, San Francisco, New York, Tokyo, London, Paris, Dubai, and Gurgaon with automated street-level CCTV viewshed projections.
 * **Multi-Spectrum Shaders**: Instant single-key switching across FLIR False-Color Thermal (`4`), Green Phosphor Night Vision (`3`), CRT Surveillance (`2`), and Sobel Edge Detection (`5`).
@@ -57,11 +59,11 @@ Unobstructed 4K photogrammetric geometry streaming in the browser with tactical 
 
 ---
 
-### 2. DeepMind AlphaEarth 10m Planetary Intelligence Foundation Model
-Compresses Earth into 10×10m multidimensional intelligence cells. Instant flood, fire, and soil assessment without six-figure satellite contracts.
+### 2. Synthetic land scenario
+Shows nominal 10 m display cells and example scores. The image and existing walkthrough show a prototype presentation, not Google AlphaEarth model output or measured flood, fire, or soil assessments.
 
 <div align="center">
-  <img src="docs/media/alphaearth_deepmind.png" alt="DeepMind AlphaEarth 10m Intelligence" width="100%" style="border-radius: 8px; border: 1px solid #334155;" />
+  <img src="docs/media/alphaearth_deepmind.png" alt="Synthetic land-scenario interface capture" width="100%" style="border-radius: 8px; border: 1px solid #334155;" />
 </div>
 
 ---
@@ -72,7 +74,7 @@ Aetheris features 5 hot-swappable domain cartridges accessible via the tactile C
 
 | Cartridge | Domain Theater | Operational Mission |
 | :--- | :--- | :--- |
-| **`🌱 AlphaEarth`** | Global (Austin / Amazon / Polar) | 10×10m DeepMind foundation model ground truth, SAR cloud-penetrating radar, and 18-day crop stress anomaly lead time. |
+| **`🌱 Land Demo`** | Example locations (Austin / Amazon / Polar) | Synthetic, coordinate-seeded scenario cells; no AlphaEarth data, SAR measurement, or validated lead time. |
 | **`⚓ SentinelMesh`** | North Atlantic (TAT-14 Corridor) | Transatlantic subsea fiber optic cable defense, anchor-drag detection, and AIS dark-vessel loitering intercepts. |
 | **`🛰️ OrbitalOps`** | Low Earth Orbit (LEO 420km) | High-conjunction satellite collision prediction (ISS vs. Cosmos debris within 2.18 km radius). |
 | **`⚡ GridTwin`** | PJM Interconnection (Loudoun County) | 765kV electrical substation thermal stress vs. generative AI datacenter cluster load. |
@@ -183,7 +185,7 @@ pnpm test
 | :--- | :--- | :--- | :--- |
 | **Developer / OSS** | Free / Open-Source | Researchers, GIS Developers | Browser WebGL, public feeds, community support |
 | **Tactical Edge** | $48,000 / year | Commercial Fleets, First Responders | Offline vector caching, drone telemetry ingest, 24/7 SLA |
-| **Enterprise Digital Twin** | $180,000 / year | Power Utilities, Climate Insurers | DeepMind AlphaEarth 10m API, custom PBR twin modeling |
+| **Enterprise Digital Twin** | Illustrative pricing hypothesis | Power Utilities, Climate Insurers | Candidate annual-embedding analysis after licensed access and validation; custom scene work would require a scoped pilot |
 | **Sovereign SCIF Airgap** | $950,000 / deployment | Defense Primes, Combatant Commands | 100% air-gapped on-premise, AgentShield v2.0, zero cloud egress |
 
 ---
@@ -202,10 +204,10 @@ pnpm test
 
 ## ⚖️ License & Acknowledgements
 
-* **License**: Open-source under the [MIT License](LICENSE).
-* **Architecture**: Engineered by **Aryaman Dev** (Aetheris Autonomous C2 Architecture, DeepMind AlphaEarth Integration, Multi-Agent Swarm, Tactical Cartridges).
+* **License**: The upstream geospatial base includes an [MIT license](gods-eye-view/LICENSE). Review rights for other modules, datasets, imagery, models, and media separately.
+* **Architecture**: Engineered by **Aryaman Dev** (Aetheris geospatial prototype, synthetic land scenario, multi-agent experiments, scenario cartridges). Google AlphaEarth integration is planned, not implemented.
 * **Upstream Geospatial Base**: Initial CesiumJS foundation by **Bilawal Sidhu** ([God's Eye View](https://github.com/bilawalsidhu/gods-eye-view)).
-* **Data Providers**: Google DeepMind (AlphaEarth), Google Maps 3D Photorealistic Tiles, OpenSky Network, CelesTrak, NASA FIRMS, AISHub, USGS, TomTom.
+* **Candidate data sources**: Google AlphaEarth annual embeddings, Google Maps 3D tiles, OpenSky Network, CelesTrak, NASA FIRMS, AISHub, USGS, and TomTom. Availability and rights are source-specific; a listed provider does not imply an active or licensed feed.
 
 <div align="center">
   <sub>Aetheris Spatial // Designed for Planetary Defense, Resilience, and Sovereign Intelligence</sub>

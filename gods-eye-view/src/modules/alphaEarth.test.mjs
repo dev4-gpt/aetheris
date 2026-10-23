@@ -9,7 +9,7 @@ import {
   createAlphaEarthCartridge
 } from './alphaEarthCartridge.js';
 
-test('AlphaEarth: 10m bounding box calculation and grid quantization', () => {
+test('Land demo: approximate nominal 10m bounding box', () => {
   const lat = 30.2747;
   const lon = -97.7404;
   const bbox = get10mBoundingBox(lat, lon);
@@ -25,7 +25,7 @@ test('AlphaEarth: 10m bounding box calculation and grid quantization', () => {
   assert.match(bbox.gridId, /^AE-10M-/);
 });
 
-test('AlphaEarth: 64-dimensional multimodal latent embedding synthesis', () => {
+test('Land demo: coordinate-seeded synthetic 64-value vector', () => {
   const emb1 = generate64DEmbedding(30.2747, -97.7404);
   const emb2 = generate64DEmbedding(30.2747, -97.7404);
   const embDifferent = generate64DEmbedding(35.6585, 139.7454);
@@ -39,7 +39,7 @@ test('AlphaEarth: 64-dimensional multimodal latent embedding synthesis', () => {
   }
 });
 
-test('AlphaEarth: Pre-acquisition land risk due diligence scoring (Capability 1)', () => {
+test('Land demo: synthetic score is explicitly identified', () => {
   const score = scoreLandParcel(30.2747, -97.7404, 'Austin Downtown Core');
 
   assert.equal(score.label, 'Austin Downtown Core');
@@ -48,30 +48,37 @@ test('AlphaEarth: Pre-acquisition land risk due diligence scoring (Capability 1)
   assert.ok(score.soilHealthIndex >= 5 && score.soilHealthIndex <= 100, `Soil health valid range: ${score.soilHealthIndex}`);
   assert.match(score.compositeGrade, /^(AAA|AA|A|BBB|BB|B|CCC|D)$/, `Valid grade: ${score.compositeGrade}`);
   assert.ok(score.valuationAdvisory.length > 10, 'Must provide actionable valuation advisory');
-  assert.equal(score.dataResolution, '10x10m Multimodal Ground Truth');
+  assert.equal(score.dataResolution, 'Approximate 10m display cell; no raster sampled');
+  assert.equal(score.synthetic, true);
+  assert.equal(score.modelUsed, false);
+  assert.match(score.source, /synthetic fixture/);
 });
 
-test('AlphaEarth: Cloud-penetrating agricultural crop stress via SAR (Capability 2)', () => {
+test('Land demo: crop scenario does not claim SAR evidence', () => {
   const stress = analyzeAgCropStress(36.7468, -119.7726, 'California Almonds');
 
   assert.equal(stress.cropType, 'California Almonds');
   assert.ok(stress.rootZoneMoistureIndex >= 5 && stress.rootZoneMoistureIndex <= 100);
   assert.ok(stress.opticalLeadDays >= 10, `Optical lead days should be >10 days, got ${stress.opticalLeadDays}`);
   assert.match(stress.stressLevel, /^(NOMINAL|MODERATE_STRESS|CRITICAL_DROUGHT)$/);
-  assert.ok(stress.cloudPenetration.includes('Radar'));
+  assert.match(stress.cloudPenetration, /no radar data loaded/);
+  assert.equal(stress.synthetic, true);
+  assert.equal(stress.modelUsed, false);
 });
 
-test('AlphaEarth: Unmapped frontier monitoring in Amazon & Antarctica (Capability 3)', () => {
+test('Land demo: frontier events are explicitly synthetic', () => {
   const amazon = detectUnmappedFrontierAnomaly(-4.2150, -55.9820, 'Amazon Tapajós Basin');
   assert.equal(amazon.biome, 'Amazon Tapajós Basin');
   assert.match(amazon.eventType, /^(STABLE_CANOPY|ILLEGAL_LOGGING_ROAD)$/);
   assert.ok(amazon.latentCosineDistance >= 0 && amazon.latentCosineDistance <= 1.0);
+  assert.equal(amazon.unmappedStatus, 'SYNTHETIC_FIXTURE');
+  assert.equal(amazon.modelUsed, false);
 
   const antarctica = detectUnmappedFrontierAnomaly(-75.1667, -100.0000, 'Pine Island Ice Shelf');
   assert.match(antarctica.eventType, /^(STABLE_CANOPY|SUB_SURFACE_ICE_RIFT)$/);
 });
 
-test('AlphaEarth: Cartridge lifecycle and threat evaluation', () => {
+test('Land demo: cartridge lifecycle and synthetic alert', () => {
   const cartridge = createAlphaEarthCartridge();
   assert.equal(cartridge.id, 'alpha-earth');
 
@@ -79,4 +86,5 @@ test('AlphaEarth: Cartridge lifecycle and threat evaluation', () => {
     { lat: 30.1785, lon: -97.7554, label: 'Austin Flood Plain' }
   ]);
   assert.ok(Array.isArray(alerts));
+  assert.ok(alerts.every(alert => alert.synthetic && alert.level === 'SYNTHETIC_SCENARIO'));
 });

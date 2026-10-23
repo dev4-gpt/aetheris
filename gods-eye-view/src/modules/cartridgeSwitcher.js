@@ -8,7 +8,7 @@ import * as Cesium from 'cesium';
  * - 🛰️ OrbitalOps (Space Domain Awareness & Conjunctions)
  * - ⚡ GridTwin (AI Datacenter Alley & Power Grid Resilience)
  * - 🔥 GeoRisk (Wildfire NASA VIIRS Proximity & Evacuation)
- * - 🌱 AlphaEarth (DeepMind 10x10m Multimodal Planetary Intelligence)
+ * - 🌱 Synthetic land demo (AlphaEarth integration planned)
  * 
  * Features automatic cinematic camera fly-to, sensor layer ignition,
  * tactical HUD telemetry cards, and autonomous Copilot dispatch.
@@ -98,22 +98,22 @@ export const CARTRIDGE_THEATERS = {
     sitrep: 'GeoRisk engaged. High-intensity VIIRS brushfire front advancing toward Porter Ranch electrical transmission corridor. Viewshed surveillance tasked.'
   },
   'alpha-earth': {
-    name: 'Austin Onion Creek 10m Foundation Sector',
+    name: 'Austin Onion Creek synthetic land scenario',
     lon: -97.7554,
     lat: 30.1785,
     alt: 650,
     pitch: -35,
     heading: 0,
-    threat: 'GROUND TRUTH',
+    threat: 'SYNTHETIC',
     threatColor: '#10b981',
-    headline: 'DeepMind 10x10m Multimodal Ground Truth',
+    headline: 'Illustrative land scenario · no AlphaEarth data',
     kpis: [
-      { label: 'RESOLUTION', value: '10x10m Planetary Mesh', color: '#10b981' },
-      { label: 'SAR RADAR', value: '100% Cloud-Penetrating', color: '#00f0ff' },
-      { label: 'INVESTMENT GRADE', value: 'BBB (Flood Plain Margin)', color: '#ffaa00' },
-      { label: 'CROP ADVANTAGE', value: '18 Days Ahead of Optical', color: '#10b981' }
+      { label: 'CELL', value: 'Nominal 10m demo', color: '#10b981' },
+      { label: 'SATELLITE INPUT', value: 'None loaded', color: '#00f0ff' },
+      { label: 'RISK INDEX', value: 'Illustrative only', color: '#ffaa00' },
+      { label: 'MODEL', value: 'Not connected', color: '#10b981' }
     ],
-    sitrep: 'Google DeepMind AlphaEarth engaged. 10x10m multimodal foundation model locked on Austin sector. Pre-acquisition due diligence & radar moisture active.'
+    sitrep: 'Synthetic land scenario. Coordinate-seeded values are for UI demonstration only; no Google AlphaEarth dataset, SAR, or measured hazard score is loaded.'
   }
 };
 
@@ -122,7 +122,7 @@ export const CARTRIDGE_THREATS = {
   'orbital-ops': { level: 'WARNING', color: '#ffaa00', desc: 'ISS Conjunction miss: 2.18km' },
   'grid-twin': { level: 'OVERLOAD', color: '#ff5533', desc: 'Loudoun Substation: 99.4% Load' },
   'geo-risk': { level: 'ELEVATED', color: '#ffdd00', desc: 'Brushfire: 1443m to Substation' },
-  'alpha-earth': { level: 'GROUND TRUTH', color: '#10b981', desc: '10x10m Foundation Model Active' }
+  'alpha-earth': { level: 'SYNTHETIC', color: '#10b981', desc: 'Illustrative land scenario · no AlphaEarth data' }
 };
 
 /**
@@ -197,7 +197,7 @@ export function initCartridgeSwitcher(registry, viewer) {
     { id: 'orbital-ops', label: 'OrbitalOps' },
     { id: 'grid-twin', label: 'GridTwin' },
     { id: 'geo-risk', label: 'GeoRisk' },
-    { id: 'alpha-earth', label: 'AlphaEarth' }
+    { id: 'alpha-earth', label: 'Land Demo' }
   ];
 
   const buttonMap = new Map();

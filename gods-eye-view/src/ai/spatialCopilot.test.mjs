@@ -339,7 +339,7 @@ test('SpatialCopilot: parseIntent & executeIntent cinema mode', async () => {
   assert.ok(res.message.includes('CINEMA MODE'));
 });
 
-test('SpatialCopilot: parseIntent & executeIntent AlphaEarth 10m planetary intelligence', async () => {
+test('SpatialCopilot: legacy AlphaEarth command labels its synthetic land result', async () => {
   const copilot = new SpatialCopilot();
 
   // Test slash command
@@ -368,11 +368,14 @@ test('SpatialCopilot: parseIntent & executeIntent AlphaEarth 10m planetary intel
   assert.strictEqual(resLand.action, 'ALPHAEARTH_LAND_SCORE');
   assert.ok(resLand.message.includes('ALPHAEARTH'));
   assert.ok(resLand.data.floodRiskScore !== undefined);
+  assert.match(resLand.message, /SYNTHETIC DEMO/);
+  assert.equal(resLand.data.modelUsed, false);
 
   // Test execution of crop stress
   const resCrop = await copilot.executeIntent(cropIntent);
   assert.strictEqual(resCrop.status, 'success');
   assert.strictEqual(resCrop.action, 'ALPHAEARTH_CROP_STRESS');
   assert.ok(resCrop.data.rootZoneMoistureIndex !== undefined);
+  assert.match(resCrop.speech, /No AlphaEarth or SAR data/);
 });
 

@@ -1,6 +1,6 @@
 # WorldClaw feasibility for Aetheris
 
-**Reviewed 20 October 2026. Decision:** use the published design as research guidance for **synthetic, explorable planning scenes**. Do not claim that Aetheris runs WorldClaw or that generated scenery represents a real installation.
+**Reviewed 20 October 2026; repository availability rechecked 23 October 2026. Decision:** use the published design as research guidance for **synthetic, explorable planning scenes**. Do not claim that Aetheris runs WorldClaw or that generated scenery represents a real installation.
 
 ## Availability and fit
 

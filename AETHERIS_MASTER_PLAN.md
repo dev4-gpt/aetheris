@@ -27,6 +27,8 @@ The repository already supports a compelling visual demonstration, but no code a
 
 The root [README](README.md) still uses language such as “live production,” “60 fps,” “14 real-time streams,” and “ground truth.” Audit each statement against deployed behavior and a dated measurement before using it externally. The [OpenArchai audit](https://github.com/dev4-gpt/OpenArchai/blob/main/AETHERIS_SPATIAL_INDEPENDENT_AUDIT.md) is a useful **dated lead**, not current proof.
 
+The [AlphaEarth, OSIRIS, and WorldClaw review](ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md) records a 23 October source check. In particular, the existing AlphaEarth-branded cartridge used coordinate-seeded synthetic values rather than Google embeddings; its user-visible outputs are now labeled as synthetic. The next real AlphaEarth trial is an annual change layer with licensed access and held-out validation, not direct hazard percentages.
+
 ## Target architecture and exact insertion points
 
 ```mermaid

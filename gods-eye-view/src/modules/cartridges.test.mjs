@@ -105,7 +105,7 @@ console.log('🧪 Testing Aetheris Enterprise Cartridge Architecture...\n');
   console.log(`✓ GeoRisk Alert verified: Fire encroaching on ${alerts[0].facilityName} (${alerts[0].distanceMeters}m away)`);
 }
 
-// 7. Test AlphaEarth Planetary 10m Ground Truth Evaluation
+// 7. Check the legacy AlphaEarth route remains a synthetic land scenario.
 {
   const alpha = createAlphaEarthCartridge();
   const parcels = [
@@ -116,7 +116,8 @@ console.log('🧪 Testing Aetheris Enterprise Cartridge Architecture...\n');
   const score = alpha.scoreLand(30.2747, -97.7404, 'Texas Capitol');
   assert.ok(score.floodRiskScore >= 0 && score.floodRiskScore <= 100);
   assert.match(score.compositeGrade, /^(AAA|AA|A|BBB|BB|B|CCC|D)$/);
-  console.log(`✓ AlphaEarth Alert verified: 10m Cell ${score.gridId} Grade: ${score.compositeGrade}`);
+  assert.equal(score.synthetic, true);
+  console.log(`✓ Synthetic land demo: nominal cell ${score.gridId} illustrative grade ${score.compositeGrade}`);
 }
 
 console.log('\n🎉 ALL ENTERPRISE CARTRIDGE TESTS PASSED!');
