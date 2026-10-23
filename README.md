@@ -21,7 +21,7 @@ The elevation scene requests 25 interpolated USGS 3DEP samples in a contiguous-U
 
 ## Deployment and verification
 
-[OCI Always Free pilot deployment](deploy/oci/README.md) explains the Arm image, HTTPS setup, source allowlist, backups, quotas, and release blockers. The `docker-compose.yml` file is the pilot deployment. OCI Always Free has no uptime SLA. Google Cloud trial credits are not used.
+[OCI Always Free pilot deployment](deploy/oci/README.md) explains the Arm image, HTTPS setup, source allowlist, backups, quotas, and release blockers. The [release gate checklist](RELEASE_GATE_CHECKLIST.md) tracks what is verified, what needs source permission, and what could require money. The `docker-compose.yml` file is the pilot deployment. OCI Always Free has no uptime SLA. Google Cloud trial credits are not used.
 
 ```bash
 node --test apps/gateway/test/gateway.test.js
