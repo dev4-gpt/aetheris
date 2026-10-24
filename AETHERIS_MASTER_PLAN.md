@@ -78,7 +78,7 @@ The groups below account for all **57 public** owned repositories. “Use” mea
 
 ### Existing base — 2
 
-- [`delightful-hawk`](https://github.com/dev4-gpt/delightful-hawk): this product repository and source of truth.
+- [`aetheris`](https://github.com/dev4-gpt/aetheris): this product repository and source of truth.
 - [`gods-eye-view`](https://github.com/dev4-gpt/gods-eye-view): geospatial foundation already represented in the monorepo; retain upstream license and attribution.
 
 ### Highest-value ideas to adapt — 9

@@ -1,6 +1,6 @@
 # 🎯 O-1A / EB-1A Founder Execution & Evidence Tracker
 **Beneficiary / Founder**: Aryaman Dev  
-**Company / Endeavor**: Aetheris AI Corp (`dev4-gpt/delightful-hawk`)  
+**Company / Endeavor**: Aetheris AI Corp (`dev4-gpt/aetheris`)
 **Objective**: Expedited O-1A Extraordinary Ability Visa & EB-1A / EB-2 NIW Permanent Residency  
 **Target Legal Standard**: *8 CFR § 204.5(h)(3)* & *Matter of Dhanasar* (National Interest Waiver)
 
@@ -53,10 +53,10 @@ All foundation legal and technical narratives are already authored and committed
 - [x] **Core 3D Engine & Testing**: 2,746 tests passing across all geospatial layers.
 - [x] **DeepMind AlphaEarth Foundation Model**: Ingested 10x10m planetary intelligence ground truth.
 - [x] **5 Enterprise Mission Cartridges**: `SentinelMesh`, `OrbitalOps`, `GridTwin`, `GeoRisk`, `AlphaEarth` live.
-- [x] **Single Monorepo Absorption**: Unified into [`dev4-gpt/delightful-hawk`](https://github.com/dev4-gpt/delightful-hawk) with zero submodules.
+- [x] **Single Monorepo Absorption**: Unified into [`dev4-gpt/aetheris`](https://github.com/dev4-gpt/aetheris) with zero submodules.
 - [x] **Master Walkthrough Video**: 1080p 60fps video tracked in [`docs/media/aetheris_gtm_product_walkthrough.mp4`](file:///Users/aryamandev/Developer/delightful-hawking/docs/media/aetheris_gtm_product_walkthrough.mp4).
 - [x] **Social Preview Banner**: Generated and committed in [`docs/media/social_preview.jpg`](file:///Users/aryamandev/Developer/delightful-hawking/docs/media/social_preview.jpg).
-- [ ] **GitHub Public Verification**: Ensure `dev4-gpt/delightful-hawk` is set to **Public** in GitHub repository settings.
+- [x] **GitHub Public Verification**: Verified `dev4-gpt/aetheris` is public on GitHub.
 - [x] **Full Academic Research Paper & Empirical Benchmark Suite**:
   - Paper: [`WHITE_PAPER_AETHERIS_WORLD_ENGINE.md`](file:///Users/aryamandev/Developer/delightful-hawking/WHITE_PAPER_AETHERIS_WORLD_ENGINE.md) expanded to full publication-grade manuscript (358 lines, 11 sections, 3 empirical tables, KaTeX math, 16 verified peer-reviewed citations).
   - Reproducible Benchmark Suite: [`scripts/run_empirical_paper_benchmarks.mjs`](file:///Users/aryamandev/Developer/delightful-hawking/scripts/run_empirical_paper_benchmarks.mjs) measuring real V8 hardware performance (spline latency, Plücker throughput, AgentShield defense rate).

@@ -33,7 +33,7 @@ Photorealistic 3D globe. Live aircraft, ships, satellites, earthquakes, traffic,
 > [!TIP]
 > ### 🚀 AETHERIS SPATIAL — LIVE PRODUCTION DEPLOYMENT
 > **Live Web App**: [https://aetheris-spatial.vercel.app](https://aetheris-spatial.vercel.app)  
-> **Master Monorepo**: [dev4-gpt/delightful-hawk](https://github.com/dev4-gpt/delightful-hawk)  
+> **Master Monorepo**: [dev4-gpt/aetheris](https://github.com/dev4-gpt/aetheris)
 > **Architecture by Aryaman Dev**: Includes a Cesium geospatial prototype, experimental agent commands (`/patrol`, `/defcon`), and five scenario cartridges. The land cartridge is a synthetic demo; Google AlphaEarth data and model inference are not connected. See the [source review](../ALPHAEARTH_OSIRIS_WORLDCLAW_REVIEW.md).
 
 ---

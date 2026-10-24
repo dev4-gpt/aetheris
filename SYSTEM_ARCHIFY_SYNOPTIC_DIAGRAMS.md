@@ -21,8 +21,8 @@ The system is decomposed into two symbiotic Git repositories:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ PARENT ORCHESTRATION REPOSITORY: delightful-hawk                                       │
-│ GitHub: git@github.com:dev4-gpt/delightful-hawk.git (Branch: master)                   │
+│ PARENT ORCHESTRATION REPOSITORY: aetheris                                              │
+│ GitHub: git@github.com:dev4-gpt/aetheris.git (Branch: master)                          │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ ├── apps/                       # Multi-agent and auxiliary micro-frontends             │
 │ ├── synaptic-ir/                # Synaptic Information Retrieval & Vector Embeddings   │
@@ -373,7 +373,7 @@ Follow this step-by-step procedure to replicate this planetary spatial architect
 
 ```bash
 # Clone the parent orchestration repo
-git clone git@github.com:dev4-gpt/delightful-hawk.git my-spatial-platform
+git clone git@github.com:dev4-gpt/aetheris.git my-spatial-platform
 cd my-spatial-platform
 
 # Initialize and update the core 3D visualization submodule

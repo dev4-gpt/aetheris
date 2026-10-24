@@ -6,7 +6,7 @@
 
 ## 1. Objective & How to Use This Framework
 
-This playbook provides a deterministic, repeatable methodology for reverse-engineering, architecting, diagramming, and deploying enterprise-scale systems modeled after the **`delightful-hawk` (Parent Orchestrator)** and **`gods-eye-view` (Visual Engine Submodule)** dual-repository paradigm.
+This playbook provides a deterministic, repeatable methodology for reverse-engineering, architecting, diagramming, and deploying enterprise-scale systems modeled after the **`aetheris` (Parent Orchestrator)** and **`gods-eye-view` (Visual Engine Submodule)** dual-repository paradigm.
 
 Whenever you embark on a new project or need to explain/replicate an existing codebase:
 1. **Pass Section 7 (The Universal System Diagram Creator Prompt)** to your AI coding agent (Antigravity/AGY, Claude, or GPT).
@@ -87,7 +87,7 @@ Use these 8 standardized diagram templates to visualize any complex system.
 ### Diagram 1: Dual-Repository Symbiosis & Codebase Topology
 ```mermaid
 graph TD
-    subgraph Parent_Repo["Parent Repository: delightful-hawk (Git Orchestrator)"]
+    subgraph Parent_Repo["Parent Repository: aetheris (Git Orchestrator)"]
         P_Apps["apps/ (Micro-frontends & Tools)"]
         P_Embed["synaptic-ir/ (Vector Search & Embeddings)"]
         P_Deploy["deploy/ (Terraform, Docker & K8s)"]
@@ -319,7 +319,7 @@ classDiagram
 ```mermaid
 graph LR
     subgraph Git_Source["GitHub Version Control"]
-        Parent["dev4-gpt/delightful-hawk (master)"]
+        Parent["dev4-gpt/aetheris (master)"]
         Child["dev4-gpt/gods-eye-view (aetheris-enterprise)"]
     end
 
