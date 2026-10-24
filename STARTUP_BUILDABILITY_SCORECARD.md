@@ -5,6 +5,8 @@
 
 ## The customer outcome to test
 
+God's Eye View is already the repository's richer Cesium globe. The [Aetheris integration decision](GODS_EYE_AETHERIS_INTEGRATION.md) makes it the candidate 3D viewer for this workflow, fed by the authenticated gateway after a rights-cleared, bounded build. This lowers viewer engineering effort; it does not replace customer validation.
+
 For one installation, test range, or critical infrastructure team, answer a recurring disruption question: **Which facilities or access routes need human review after a public event or a permitted local observation, what evidence supports that decision, and what changed since the last review?** Aetheris should ingest a rights-cleared observation, show source and age, compare it with a grounded area and an explicitly synthetic scenario, and export a decision record the team can replay.
 
 The buyer is the person who owns this workflow and a budget, not everyone who likes a globe. First discover whether that person exists, how often the decision occurs, what they use today, what errors or delays cost them, and which data they may legally provide. Ask users to show a recent redacted decision and its current toolchain. Do not collect classified or restricted data for this discovery.

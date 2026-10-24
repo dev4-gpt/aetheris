@@ -27,7 +27,7 @@ The elevation scene requests 25 interpolated USGS 3DEP samples in a contiguous-U
 node --test apps/gateway/test/gateway.test.js
 ```
 
-The older Cesium console remains in `gods-eye-view/` as a research prototype with its own development proxy and provider setup. The creative `apps/studio/` is synthetic. Neither is the hardened pilot gateway. Their screenshots, simulations, model lists, and historical marketing material are not evidence of a live defense deployment.
+The richer Cesium console in `gods-eye-view/` is the intended 3D viewer foundation. Its current entry point remains a research prototype with a development proxy and provider setup; see the [God's Eye View integration decision](GODS_EYE_AETHERIS_INTEGRATION.md) for the bounded, same-origin product path and source-rights checks. The creative `apps/studio/` is synthetic. Their screenshots, simulations, model lists, and historical marketing material are not evidence of a live defense deployment.
 
 ## Data and license notes
 
