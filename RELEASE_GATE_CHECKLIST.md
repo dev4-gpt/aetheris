@@ -13,6 +13,8 @@ Checked items are verified in the repository as of 2026-10-23. An unchecked item
 
 ## External pilot gate — mainly deployment and validation, not a license fee
 
+The [Aetheris Spatial Vercel console](https://aetheris-spatial.vercel.app/) is already a public visual demo. The gates below concern external deployment of the newer authenticated gateway pilot and its customer-ready operations; the demo does not satisfy them.
+
 - [ ] Obtain an **Always Free** OCI Ampere A1 instance with enough regional capacity. **Money:** $0 if available within free quotas; free capacity can be unavailable, and Always Free has no uptime SLA. Do not enable paid resources. [OCI FAQ](https://www.oracle.com/cloud/free/faq/)
 - [ ] Deploy the committed image behind HTTPS, verify login, roles, health checks, data persistence, and fixed outbound source access from that VM. **Money:** $0 within free limits; DNS may need an existing or free hostname.
 - [ ] Copy a backup off the VM, restore it on the VM, and verify a saved decision. **Money:** $0 if using storage already within free quotas; an off-VM destination still needs to be chosen.

@@ -4,6 +4,8 @@ Repository: [dev4-gpt/aetheris](https://github.com/dev4-gpt/aetheris).
 
 Aetheris is an unclassified base resilience planning prototype. The new pilot workspace reviews public or operator-imported observations on a rotatable globe or flat map, shows source and freshness, builds a bounded U.S. terrain scene from USGS elevation samples, and saves replayable decision records. Both world views and the light/dark theme can be switched in the workspace. It is designed for human review; it does not authenticate user-imported claims, provide a surveyed terrain model, or make operational decisions.
 
+**Public 3D demo:** [Aetheris Spatial](https://aetheris-spatial.vercel.app/) is the existing Cesium console deployed on Vercel; a [shared Tokyo view](https://aetheris-spatial.vercel.app/#v=2&lat=35.6536&lon=139.6982&alt=389&heading=18&pitch=-22&roll=360&style=normal&bloom=1&sharpen=1&bi=0&bv=2&si=61&hud=tactical&hv=1&dm=DENSE&dd=75&da=elastic&kf=7&ko=1&cr=0&sc=1&scf=11&map=photoreal&l=c&lo=c.p.0_c.a.1_f.e.1_f.m.a&ui=c.c.1_c.p.0_l.c.1_l.p.0_d.c.1_v.c.0_r.c.1_s.c.0_g.c.1_p.c.1_m.c.0) opens its 3D viewer. The authenticated pilot described below is a separate gateway workspace and has not been deployed as the external OCI pilot. The Vercel demo demonstrates visualization, not verified customer use, feed rights, or production readiness of the newer pilot.
+
 ## Pilot workspace
 
 Requires Node.js 24.14 or newer. The gateway dependencies are locked in `apps/gateway/package-lock.json`.
