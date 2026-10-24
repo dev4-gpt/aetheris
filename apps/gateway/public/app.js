@@ -34,6 +34,15 @@ function status(id, message) { $(id).textContent = message; }
 function safeLink(url) { try { const parsed = new URL(url); return parsed.protocol === 'https:' ? parsed.href : null; } catch { return null; } }
 function el(tag, text, className) { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; }
 const iso = value => value && Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleString() : 'Unknown';
+const scenarioKinds = ['sea-scenario', 'air-scenario', 'naval-scenario'];
+
+function setImported(records) {
+  state.feeds.set('imported', { status: 'static', observations: records.filter(record => !scenarioKinds.includes(record.kind) || record.status !== 'synthetic') });
+  for (const id of scenarioKinds) {
+    const observations = records.filter(record => record.kind === id && record.status === 'synthetic');
+    state.feeds.set(id, { status: 'synthetic', observations, error: observations.length ? null : 'Add an operator-authored marker below' });
+  }
+}
 
 async function enter(session) {
   state.csrf = session.csrf; state.role = session.role;
@@ -41,7 +50,8 @@ async function enter(session) {
   status('userLabel', `${session.username} · ${session.role}`);
   const [layers, imported, decisions] = await Promise.all([api('/api/v1/layers'), api('/api/v1/observations/imported'), api('/api/v1/decisions')]);
   state.layers = layers.layers;
-  state.feeds.set('imported', { status: 'static', observations: imported.observations });
+  setImported(imported.observations);
+  $('scenarioForm').hidden = state.role === 'viewer';
   renderLayers(); renderObservations(); renderDecisionList(decisions.decisions);
   try { const land = await fetch('/world-regions.json').then(r => r.json()); state.land = (land.features || []).filter(feature => feature.featurecla === 'Continent'); buildGlobeTexture(); renderMap(); } catch { status('mapStatus', 'Land outline unavailable; observation coordinates remain available'); }
 }
@@ -65,13 +75,14 @@ async function toggleLayer(layer) {
   state.active.add(layer.id); renderLayers();
   if (layer.mode === 'feed') {
     status('feedSummary', `Loading ${layer.title}…`);
-    try { state.feeds.set(layer.id, await api(`/api/v1/feeds/${encodeURIComponent(layer.id)}`)); }
+    const area = new FormData($('areaForm'));
+    const location = layer.id === 'wind' || layer.id === 'rain' ? `?latitude=${encodeURIComponent(area.get('latitude'))}&longitude=${encodeURIComponent(area.get('longitude'))}` : '';
+    try { state.feeds.set(layer.id, await api(`/api/v1/feeds/${encodeURIComponent(layer.id)}${location}`)); }
     catch (error) { state.feeds.set(layer.id, { status: 'unavailable', observations: [], error: error.message }); }
   } else {
     const computed = layer.mode === 'computed';
-    state.feeds.set(layer.id, { status: computed ? 'computed' : 'unavailable', observations: [],
-      error: computed ? null : layer.mode === 'permission-gated' ? 'Operational source permission is pending'
-        : layer.mode === 'synthetic' ? 'Scenario engine is not enabled in this pilot' : 'Reviewed source or forecast adapter is pending' });
+    if (layer.mode !== 'synthetic') state.feeds.set(layer.id, { status: computed ? 'computed' : 'unavailable', observations: [],
+      error: computed ? null : layer.mode === 'permission-gated' ? 'Source permission is pending' : 'Reviewed source is pending' });
   }
   const result = state.feeds.get(layer.id);
   status('feedSummary', `${layer.title}: ${result.status}${result.error ? ` · ${result.error}` : ` · ${result.observations.length} records`}`);
@@ -104,8 +115,11 @@ function selectObservation(record) {
   const detail = $('evidenceDetail'); detail.replaceChildren();
   detail.append(el('span', record.status.toUpperCase(), `state ${record.status}`), el('h3', record.label));
   const dl = el('dl');
-  const fields = [['Type', record.kind], ['Source', record.source.id], ['Observed', iso(record.observedAt)], ['Fetched', iso(record.fetchedAt)],
+  const fields = [['Type', record.kind], ['Source', record.source.id], [record.status === 'forecast' ? 'Forecast issued' : 'Observed', iso(record.observedAt)], ['Fetched', iso(record.fetchedAt)],
     ['Coordinates', record.geometry ? record.geometry.coordinates.join(', ') : 'No verified point'], ['Rights', record.source.license]];
+  if (record.properties?.positionType) fields.push(['Position', record.properties.positionType], ['Predicted for', iso(record.properties.predictedAt)]);
+  if (record.properties?.forecastValidFrom) fields.push(['Forecast valid', `${iso(record.properties.forecastValidFrom)} to ${iso(record.properties.forecastValidTo)}`]);
+  if (record.properties?.note) fields.push(['Limitation', record.properties.note]);
   for (const [name, value] of fields) dl.append(el('dt', name), el('dd', String(value ?? 'Unknown')));
   detail.append(dl);
   const sourceUrl = safeLink(record.source.url); if (sourceUrl) { const a = el('a', 'Open source ↗'); a.href = sourceUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; detail.append(a); }
@@ -269,9 +283,32 @@ $('areaForm').addEventListener('submit', async event => { event.preventDefault()
   catch (error) { status('terrainStatus', `Area unavailable: ${error.message}`); } });
 $('importFile').addEventListener('change', async event => { const file = event.target.files[0]; if (!file) return;
   if (file.size > 1_000_000) { status('decisionStatus', 'Import exceeds 1 MB'); return; }
-  try { const result = await api('/api/v1/observations/import', { method: 'POST', body: await file.text() }); state.feeds.set('imported', { status: 'static', observations: result.observations });
+  try { const result = await api('/api/v1/observations/import', { method: 'POST', body: await file.text() }); setImported((await api('/api/v1/observations/imported')).observations);
     renderObservations(); status('decisionStatus', `${result.observations.length} imported; source metadata is user declared.`); }
   catch (error) { status('decisionStatus', `Import failed: ${error.message}`); } });
+$('scenarioForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  const kind = String(form.get('kind'));
+  if (!scenarioKinds.includes(kind)) return;
+  const latitude = Number(form.get('latitude')), longitude = Number(form.get('longitude'));
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+  const payload = { type: 'FeatureCollection', features: [{ type: 'Feature', id: crypto.randomUUID(),
+    geometry: { type: 'Point', coordinates: [longitude, latitude] }, properties: { label: String(form.get('label')), kind,
+      source: 'Aetheris operator', sourceUrl: 'urn:aetheris:operator-scenario', license: 'Operator-authored scenario',
+      dataClass: 'synthetic', observedAt: new Date().toISOString() } }] };
+  try {
+    await api('/api/v1/observations/import', { method: 'POST', body: JSON.stringify(payload) });
+    setImported((await api('/api/v1/observations/imported')).observations);
+    state.active.add(kind); renderLayers(); renderObservations();
+    status('scenarioStatus', 'Saved synthetic marker. Select it to include it in a decision.');
+  } catch (error) { status('scenarioStatus', error.message); }
+});
+setInterval(async () => {
+  if (!state.active.has('satellites')) return;
+  try { state.feeds.set('satellites', await api('/api/v1/feeds/satellites')); renderObservations(); }
+  catch { /* The next manual layer selection reports the source error. */ }
+}, 60_000);
 $('decisionForm').addEventListener('submit', async event => { event.preventDefault(); if (!state.scene) { status('decisionStatus', 'Build a grounded area first.'); return; }
   const form = new FormData(event.currentTarget);
   try { const result = await api('/api/v1/decisions', { method: 'POST', body: JSON.stringify({ title: form.get('title'), note: form.get('note'), sceneId: state.scene.id, observationIds: [...state.selected.keys()].slice(0, 50) }) });

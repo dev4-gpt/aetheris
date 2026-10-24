@@ -38,6 +38,14 @@
           <div class="panel-heading"><div><span class="eyebrow">01 / SOURCES</span><h2 id="layerTitle">Layer control</h2></div><span id="layerCount" class="count"></span></div>
           <p class="panel-help">Only selected feeds load. Each layer shows its actual coverage and source state.</p>
           <div id="layerList" class="layer-list"></div>
+          <form id="scenarioForm" class="scenario-form">
+            <strong>Add planning marker</strong>
+            <label>Scenario<select name="kind"><option value="sea-scenario">Sea</option><option value="air-scenario">Air</option><option value="naval-scenario">Naval</option></select></label>
+            <label>Label<input name="label" maxlength="120" required placeholder="Operator scenario marker"></label>
+            <div class="scenario-coordinates"><label>Latitude<input name="latitude" type="number" min="-90" max="90" step="any" required value="38.8895"></label><label>Longitude<input name="longitude" type="number" min="-180" max="180" step="any" required value="-77.0353"></label></div>
+            <button type="submit" class="quiet">Add synthetic marker</button>
+            <small id="scenarioStatus" role="status">Operator authored, never a live position.</small>
+          </form>
           <div class="panel-note">No layer substitutes simulated records when a provider is down.</div>
         </aside>
 

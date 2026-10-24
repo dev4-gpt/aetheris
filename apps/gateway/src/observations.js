@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-export const DATA_STATES = Object.freeze(['live', 'delayed', 'static', 'synthetic', 'unavailable']);
+export const DATA_STATES = Object.freeze(['live', 'delayed', 'static', 'synthetic', 'forecast', 'unavailable']);
 
 export function observation({ source, sourceUrl, license, id, label, coordinates = null, observedAt, fetchedAt, status, kind, properties = {} }) {
   if (!DATA_STATES.includes(status)) throw new TypeError('Invalid observation status');

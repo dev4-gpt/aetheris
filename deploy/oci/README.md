@@ -10,7 +10,7 @@ This is a small, unclassified public-data pilot. The software has authentication
 4. From the repo root, run `docker compose build --pull` and `docker compose up -d`. Caddy issues the HTTPS certificate. Visit the configured hostname and sign in as `admin`.
 5. Create separate `operator` and `viewer` accounts through the protected `/api/v1/admin/users` route. The bootstrap password is used only when creating the first `admin` row; changing the environment value later does not rotate that account.
 
-The image uses Node 24.14, `npm ci`, a non-root process, no external font or model API, and a 1 MiB HTTP body limit. The only application outbound URLs are fixed in `apps/gateway/src/feeds.js` and `apps/gateway/src/scenes.js`: USGS, NASA EONET, NWS, CelesTrak, Fintraffic, GDELT, and USGS EPQS. The app has no URL-fetch endpoint. A network firewall should limit egress to HTTPS and DNS where feasible. The product should not claim global live maritime or aviation coverage from these adapters.
+The image uses Node 24.14, `npm ci`, a non-root process, no external font or model API, and a 1 MiB HTTP body limit. The only application outbound sources are defined in `apps/gateway/src/feeds.js` and `apps/gateway/src/scenes.js`: USGS, NASA EONET, NWS, CelesTrak, Fintraffic, GDELT, and USGS EPQS. NWS point discovery may return a forecast URL; the gateway accepts it only on the approved `api.weather.gov` host and hourly gridpoint path. The app has no arbitrary URL-fetch endpoint. A network firewall should limit egress to HTTPS and DNS where feasible. The product should not claim global live maritime or aviation coverage from these adapters.
 
 ## Backup and restore
 

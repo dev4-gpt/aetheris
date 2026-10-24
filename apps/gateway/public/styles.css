@@ -11,6 +11,8 @@
 :root[data-theme="light"] .panel,:root[data-theme="light"] .login-card{background:#fff}
 :root[data-theme="light"] .badge,:root[data-theme="light"] .tiny-label{border-color:#8ebbb6}
 :root[data-theme="light"] .panel-note{background:#fff3db;color:#725427;border-left-color:var(--amber)}
+.scenario-form{display:grid;gap:9px;margin:14px;padding:14px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}.scenario-form strong{font-size:12px}.scenario-form label{font-size:10px;color:var(--muted)}.scenario-form input,.scenario-form select{width:100%;margin-top:4px;min-height:36px;padding:7px;border:1px solid var(--line);border-radius:4px;color:var(--text);background:var(--surface)}.scenario-coordinates{display:grid;grid-template-columns:1fr 1fr;gap:9px}.scenario-form small{color:var(--muted);line-height:1.4}.scenario-form[hidden]{display:none}
+.state.prediction,.state.synthetic{color:#bba9f1}
 :root[data-theme="light"] .layer.active{background:#e1f4ef;border-color:#60aa9c}
 :root[data-theme="light"] .layer:hover,:root[data-theme="light"] .layer:focus-visible{background:#eaf4f2}
 :root[data-theme="light"] .map-wrap{background:radial-gradient(ellipse at center,#d7e9ed,#edf5f6 75%)}

@@ -16,8 +16,10 @@ function fakeFetch(url) {
   if (url.includes('epqs.nationalmap.gov')) return Promise.resolve(response({ value: '125.4' }));
   if (url.includes('earthquake.usgs.gov')) return Promise.resolve(response({ features: [{ type: 'Feature', id: 'eq1', geometry: { type: 'Point', coordinates: [-77, 38] }, properties: { title: 'Test earthquake', time: Date.now(), url: 'https://earthquake.usgs.gov' } }] }));
   if (url.includes('eonet.gsfc.nasa.gov')) return Promise.resolve(response({ events: [{ id: 'e1', title: 'Test storm', link: 'https://eonet.gsfc.nasa.gov', geometry: [{ date: now(), coordinates: [-75, 38] }] }] }));
+  if (url.includes('api.weather.gov/points/')) return Promise.resolve(response({ properties: { forecastHourly: 'https://api.weather.gov/gridpoints/LWX/96,70/forecast/hourly' } }));
+  if (url.includes('api.weather.gov/gridpoints/')) return Promise.resolve(response({ properties: { updateTime: now(), periods: [{ startTime: new Date(Date.now() - 60_000).toISOString(), endTime: new Date(Date.now() + 60 * 60_000).toISOString(), windSpeed: '12 mph', windDirection: 'NW', probabilityOfPrecipitation: { value: 45 } }] } }));
   if (url.includes('api.weather.gov')) return Promise.resolve(response({ features: [{ type: 'Feature', id: 'w1', geometry: { type: 'Point', coordinates: [-77, 39] }, properties: { event: 'Test alert', sent: now() } }] }));
-  if (url.includes('celestrak.org')) return Promise.resolve(response([{ NORAD_CAT_ID: 25544, OBJECT_NAME: 'ISS', EPOCH: now() }]));
+  if (url.includes('celestrak.org')) return Promise.resolve(response([{ NORAD_CAT_ID: 25544, OBJECT_NAME: 'ISS', EPOCH: now(), MEAN_MOTION: 15.49, ECCENTRICITY: 0.00048, INCLINATION: 51.63, RA_OF_ASC_NODE: 186.94, ARG_OF_PERICENTER: 163.3, MEAN_ANOMALY: 196.81, MEAN_MOTION_DOT: 0.00008, MEAN_MOTION_DDOT: 0, BSTAR: 0.00015 }]));
   if (url.includes('digitraffic.fi')) return Promise.resolve(response({ features: [{ id: 'v1', geometry: { coordinates: [24.9, 60.1] }, properties: { mmsi: 123456789, timestamp: Math.floor(Date.now() / 1000) } }] }));
   if (url.includes('gdeltproject.org')) return Promise.resolve(response({ articles: [{ url: 'https://example.org/news', title: 'Test news', seendate: now() }] }));
   throw new Error('Unexpected URL');
@@ -51,7 +53,7 @@ describe('pilot gateway', () => {
   });
 
   test('real adapters preserve source, time, rights, and coverage', async () => {
-    for (const id of ['earthquakes', 'events', 'weather', 'satellites', 'maritime', 'news']) {
+    for (const id of ['earthquakes', 'events', 'weather', 'satellites', 'maritime', 'news', 'wind', 'rain']) {
       const result = await app.inject({ url: `/api/v1/feeds/${id}`, headers: auth() });
       assert.equal(result.statusCode, 200);
       const body = result.json();
@@ -59,11 +61,14 @@ describe('pilot gateway', () => {
       assert.equal(body.observations[0].schemaVersion, 1);
       assert.ok(body.observations[0].source.license);
       assert.ok(body.observations[0].observedAt);
+      if (id === 'satellites') { assert.ok(body.observations[0].geometry); assert.equal(body.observations[0].properties.positionType, 'SGP4 prediction'); }
+      if (id === 'wind' || id === 'rain') assert.equal(body.status, 'forecast');
     }
     const flights = (await app.inject({ url: '/api/v1/feeds/flights', headers: auth() })).json();
     assert.equal(flights.status, 'unavailable');
     assert.deepEqual(flights.observations, []);
     assert.equal((await app.inject({ url: '/api/opensky', headers: auth() })).statusCode, 410);
+    assert.equal((await app.inject({ url: '/api/v1/feeds/wind?latitude=0&longitude=0', headers: auth() })).statusCode, 400);
   });
 
   test('CSRF and roles protect mutations', async () => {
@@ -142,6 +147,40 @@ test('outage and rate limit never become fake live data; stale cache is labeled 
   const stale = await service.get('earthquakes');
   assert.equal(stale.status, 'delayed'); assert.equal(stale.observations[0].status, 'delayed');
   assert.equal((await service.get('flights')).status, 'unavailable');
+});
+
+test('cached orbital elements yield new predicted positions without another provider request', async () => {
+  let time = Date.now(), calls = 0;
+  const service = createFeedService({ now: () => time, fetchImpl: async () => {
+    calls++;
+    return response([{ NORAD_CAT_ID: 25544, OBJECT_NAME: 'ISS', EPOCH: new Date(time).toISOString(), MEAN_MOTION: 15.49,
+      ECCENTRICITY: 0.00048, INCLINATION: 51.63, RA_OF_ASC_NODE: 186.94, ARG_OF_PERICENTER: 163.3,
+      MEAN_ANOMALY: 196.81, MEAN_MOTION_DOT: 0.00008, MEAN_MOTION_DDOT: 0, BSTAR: 0.00015 }]);
+  } });
+  const first = await service.get('satellites');
+  time += 60_000;
+  const second = await service.get('satellites');
+  assert.equal(first.status, 'prediction');
+  assert.equal(second.status, 'prediction');
+  assert.equal(calls, 1);
+  assert.notDeepEqual(first.observations[0].geometry.coordinates, second.observations[0].geometry.coordinates);
+  assert.notEqual(first.observations[0].properties.predictedAt, second.observations[0].properties.predictedAt);
+});
+
+test('forecast discovery rejects unapproved URLs and AIS selects newest vessels', async () => {
+  let calls = 0;
+  const bad = createFeedService({ fetchImpl: async () => { calls++; return response({ properties: { forecastHourly: 'https://example.org/steal' } }); } });
+  assert.equal((await bad.get('wind')).status, 'unavailable');
+  assert.equal(calls, 1);
+  const clock = Date.now();
+  const maritime = createFeedService({ now: () => clock, fetchImpl: async () => response({ features: [
+    { properties: { mmsi: 111111111, timestamp: 45, timestampExternal: clock - 60 * 60_000 }, geometry: { coordinates: [24, 60] } },
+    { properties: { mmsi: 222222222, timestamp: 12, timestampExternal: clock }, geometry: { coordinates: [25, 61] } }
+  ] }) });
+  const result = await maritime.get('maritime');
+  assert.equal(result.status, 'live');
+  assert.equal(result.observations[0].properties.mmsi, 222222222);
+  assert.equal(result.observations[1].status, 'delayed');
 });
 
 test('database backup can restore a decision record', async () => {

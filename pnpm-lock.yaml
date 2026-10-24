@@ -26,6 +26,9 @@ importers:
       fastify:
         specifier: ^5.12.7
         version: 5.12.7
+      satellite.js:
+        specifier: ^6.0.2
+        version: 6.0.2
 
   apps/studio:
     dependencies:

@@ -60,7 +60,9 @@ export async function buildServer(options = {}) {
   app.get('/api/v1/layers', async () => ({ schemaVersion: 1, layers: LAYERS }));
   app.get('/api/v1/feeds/:id', async (request, reply) => {
     if (!LAYERS.some(layer => layer.id === request.params.id)) return reply.code(404).send({ error: 'Unknown layer' });
-    const result = await feeds.get(request.params.id);
+    let result;
+    try { result = await feeds.get(request.params.id, request.query); }
+    catch (error) { return reply.code(400).send({ error: error.message }); }
     for (const item of result.observations) store.saveObservation(item);
     return { schemaVersion: 1, layerId: request.params.id, ...result };
   });
