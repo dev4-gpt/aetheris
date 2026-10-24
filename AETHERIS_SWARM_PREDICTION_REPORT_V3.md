@@ -1,3 +1,5 @@
+> **Historical synthetic scenario only.** This document was generated from invented agent personas by `scripts/aetheris_swarm_evaluator.py`, which calls an LLM directly rather than running the official MiroFish engine. Its scores, win rates, revenue, valuation, purchase intent, benchmark, security, and compliance statements are **not verified facts or forecasts**. Do not use them in investor, customer, procurement, or immigration materials. See the [current market assessment](AETHERIS_MARKET_RESEARCH_2026.md) and [independent audit](AETHERIS_SPATIAL_INDEPENDENT_AUDIT.md).
+
 **MIROFISH PREDICTION REPORT V3**
 =====================================
 
